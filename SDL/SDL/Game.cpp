@@ -56,38 +56,24 @@ bool Game::Initialize(const char* title, int xpos, int ypos, int width, int heig
 
 void Game::LoadContent()
 {
-	DEBUG_MSG("Loading Content");
-	m_p_Surface = IMG_Load("assets/sprite.png");
-	m_p_Texture = SDL_CreateTextureFromSurface(m_p_Renderer, m_p_Surface);
-	SDL_FreeSurface(m_p_Surface);
 
-	if(SDL_QueryTexture(m_p_Texture, NULL, NULL, &m_Source.w, &m_Destination.h)==0)
+	if (!TextureManager::Instance()->load("assets/1.png", Texture::Player, m_p_Renderer))
 	{
-		m_Destination.x = m_Source.x = 0;
-		m_Destination.y = m_Source.y = 0;
-		m_Destination.w = m_Source.w;
-		m_Destination.h = m_Source.h;
-
-		//DEBUG_MSG("Destination X:" + m_Destination.x);
-		/*DEBUG_MSG("Destination Y:" + m_Destination.y);
-		DEBUG_MSG("Destination W:" + m_Destination.w);
-		DEBUG_MSG("Destination H:" + m_Destination.h);*/
+			DEBUG_MSG("Texture Query Failed");
 	}
-	else
-	{
-		DEBUG_MSG("Texture Query Failed");
-		m_running = false;
+	if (!TextureManager::Instance()->load("assets/2.png", Texture::Level, m_p_Renderer))
+		{
+			DEBUG_MSG("Texture Query Failed");
 	}
 }
 
 void Game::Render()
 {
 	SDL_RenderClear(m_p_Renderer);
-	//DEBUG_MSG("Width Source" + m_Destination.w);
-	//DEBUG_MSG("Width Destination" + m_Destination.w);
 
-	if(m_p_Renderer != nullptr && m_p_Texture != nullptr)
-		SDL_RenderCopy(m_p_Renderer, m_p_Texture, NULL, NULL);
+	TextureManager::Instance()->draw(Texture::Player, 100, 100, 100, 100, m_p_Renderer);
+	TextureManager::Instance()->draw(Texture::Level, 300, 300, 100, 100, m_p_Renderer);
+
 	SDL_RenderPresent(m_p_Renderer);
 }
 
@@ -140,8 +126,7 @@ bool Game::IsRunning()
 void Game::UnloadContent()
 {
 	DEBUG_MSG("Unloading Content");
-	//delete(m_p_Texture);
-	//m_p_Texture = NULL;
+	TextureManager::Instance()->cleanUpAll();
 }
 
 void Game::CleanUp()

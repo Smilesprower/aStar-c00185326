@@ -43,8 +43,8 @@ int main(int argc, char** argv) {
 
 	game->LoadContent();
 
-	thread t1(&Process::run, Process((*(game)))); //Passing references
-	t1.detach(); //detaches from SDL mainline
+	//thread t1(&Process::run, Process((*(game)))); //Passing references
+	//t1.detach(); //detaches from SDL mainline
 
 	DEBUG_MSG("Game Loop Starting......");
 	while (game->IsRunning())
