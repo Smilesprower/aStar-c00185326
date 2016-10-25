@@ -3,6 +3,7 @@
 #include "Debug.h"
 #include <SDL.h>
 #include "TextureManager.h"
+#include "MenuScene.h"
 #include "ResourceIdentifier.h"
 
 class Game

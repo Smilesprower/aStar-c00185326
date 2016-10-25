@@ -3,11 +3,10 @@
 #include <iostream>
 #include <thread>
 
-
-using namespace std;
-
 Game::Game() : m_running(false)
 {
+	SceneManager::Instance()->addScene(new MenuScene());
+	SceneManager::Instance()->changeScene(Scenes::MenuScene);
 }
 
 Game::~Game()
@@ -56,13 +55,13 @@ bool Game::Initialize(const char* title, int xpos, int ypos, int width, int heig
 
 void Game::LoadContent()
 {
-
-	if (!TextureManager::Instance()->load("assets/1.png", Texture::Player, m_p_Renderer))
+	// For the moment this will load all Textures;
+	if (!TextureManager::Instance()->load("assets/1.png", Textures::Player, m_p_Renderer))
 	{
 			DEBUG_MSG("Texture Query Failed");
 	}
-	if (!TextureManager::Instance()->load("assets/2.png", Texture::Level, m_p_Renderer))
-		{
+	if (!TextureManager::Instance()->load("assets/2.png", Textures::Level, m_p_Renderer))
+	{
 			DEBUG_MSG("Texture Query Failed");
 	}
 }
@@ -70,10 +69,7 @@ void Game::LoadContent()
 void Game::Render()
 {
 	SDL_RenderClear(m_p_Renderer);
-
-	TextureManager::Instance()->draw(Texture::Player, 100, 100, 100, 100, m_p_Renderer);
-	TextureManager::Instance()->draw(Texture::Level, 300, 300, 100, 100, m_p_Renderer);
-
+	SceneManager::Instance()->render(m_p_Renderer);
 	SDL_RenderPresent(m_p_Renderer);
 }
 
@@ -90,31 +86,32 @@ void Game::HandleEvents()
 	{
 		switch(event.type)
 			case SDL_KEYDOWN:
-				switch(event.key.keysym.sym)
+				switch (event.key.keysym.sym)
 				{
-				case SDLK_ESCAPE:
-					m_running = false;
-					break;
-				case SDLK_UP:
-					DEBUG_MSG("Up Key Pressed");
-					SDL_SetRenderDrawColor(m_p_Renderer, 255, 0, 0, 255);
-					break;
-				case SDLK_DOWN:
-					DEBUG_MSG("Down Key Pressed");
-					SDL_SetRenderDrawColor(m_p_Renderer, 0, 255, 0, 255);
-					break;
-				case SDLK_LEFT:
-					DEBUG_MSG("Left Key Pressed");
-					SDL_SetRenderDrawColor(m_p_Renderer, 0, 0, 255, 255);
-					break;
-				case SDLK_RIGHT:
-					DEBUG_MSG("Right Key Pressed");
-					SDL_SetRenderDrawColor(m_p_Renderer, 255, 255, 255, 255);
-					break;
-				default:
-					SDL_SetRenderDrawColor(m_p_Renderer, 0, 0, 0, 255);
-					break;
+					case SDLK_ESCAPE:
+						m_running = false;
+						break;
 				}
+				//case SDLK_UP:
+				//	DEBUG_MSG("Up Key Pressed");
+				//	SDL_SetRenderDrawColor(m_p_Renderer, 255, 0, 0, 255);
+				//	break;
+				//case SDLK_DOWN:
+				//	DEBUG_MSG("Down Key Pressed");
+				//	SDL_SetRenderDrawColor(m_p_Renderer, 0, 255, 0, 255);
+				//	break;
+				//case SDLK_LEFT:
+				//	DEBUG_MSG("Left Key Pressed");
+				//	SDL_SetRenderDrawColor(m_p_Renderer, 0, 0, 255, 255);
+				//	break;
+				//case SDLK_RIGHT:
+				//	DEBUG_MSG("Right Key Pressed");
+				//	SDL_SetRenderDrawColor(m_p_Renderer, 255, 255, 255, 255);
+				//	break;
+				//default:
+				//	SDL_SetRenderDrawColor(m_p_Renderer, 0, 0, 0, 255);
+				//	break;
+				//}
 	}
 }
 

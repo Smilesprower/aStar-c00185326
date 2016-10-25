@@ -1,9 +1,17 @@
 #pragma once
-namespace Texture
+namespace Textures
 {
 	enum ID
 	{
 		Player,
 		Level
+	};
+}
+namespace Scenes
+{
+	enum ID
+	{
+		MenuScene,
+		GameScene
 	};
 }
