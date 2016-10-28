@@ -6,7 +6,7 @@ class SceneManager
 {
 public:
 	static SceneManager * Instance();
-	void onEvent();
+	void onEvent(bool &quit);
 	void update(float deltaTime);
 	void changeScene(int scene);
 	void render(SDL_Renderer* renderer);

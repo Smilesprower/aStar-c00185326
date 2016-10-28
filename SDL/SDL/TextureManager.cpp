@@ -49,7 +49,13 @@ void TextureManager::draw(int id, int x, int y, int w, int h,  SDL_Renderer * pR
 	// Dest Rect is where we want to draw the rectangle.
 	SDL_RenderCopyEx(pRenderer, m_textureMap[id], &srcRect, &destRect, 0, nullptr, flip);
 }
-void TextureManager::cleanUpAll()
+
+TextureManager::TextureManager()
+{
+}
+
+
+TextureManager::~TextureManager()
 {
 	if (!m_textureMap.empty())
 	{
@@ -60,13 +66,4 @@ void TextureManager::cleanUpAll()
 		}
 		m_textureMap.clear();
 	}
-}
-
-TextureManager::TextureManager()
-{
-}
-
-
-TextureManager::~TextureManager()
-{
 }

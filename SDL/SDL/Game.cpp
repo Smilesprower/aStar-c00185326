@@ -3,10 +3,13 @@
 #include <iostream>
 #include <thread>
 
-Game::Game() : m_running(false)
+const int SCREEN_FPS = 100;
+const int SCREEN_TICKS_PER_FRAME = 1000 / SCREEN_FPS;
+
+Game::Game() 
+	: m_quit(false)
+	, m_lastTime(LTimer::gameTime())
 {
-	SceneManager::Instance()->addScene(new MenuScene());
-	SceneManager::Instance()->changeScene(Scenes::MenuScene);
 }
 
 Game::~Game()
@@ -46,24 +49,11 @@ bool Game::Initialize(const char* title, int xpos, int ypos, int width, int heig
 		DEBUG_MSG("SDL init fail");
 		return false;
 	}
-	m_running = true;
+
+	// Load Scenes
+	SceneManager::Instance()->addScene(new MenuScene(m_p_Renderer));
 
 	return true;
-}
-
-
-
-void Game::LoadContent()
-{
-	// For the moment this will load all Textures;
-	if (!TextureManager::Instance()->load("assets/1.png", Textures::Player, m_p_Renderer))
-	{
-			DEBUG_MSG("Texture Query Failed");
-	}
-	if (!TextureManager::Instance()->load("assets/2.png", Textures::Level, m_p_Renderer))
-	{
-			DEBUG_MSG("Texture Query Failed");
-	}
 }
 
 void Game::Render()
@@ -75,55 +65,23 @@ void Game::Render()
 
 void Game::Update()
 {
-	//DEBUG_MSG("Updating....");
+	unsigned int currentTime = LTimer::gameTime();
+	float deltaTime = (currentTime - m_lastTime) / 1000.f;
+	SceneManager::Instance()->update(deltaTime);
+	m_lastTime = currentTime;
 }
 
 void Game::HandleEvents()
 {
-	SDL_Event event;
-
-	while (SDL_PollEvent(&event))
+	Keyboard::Instance()->update();
+	while (SDL_PollEvent(&event) != 0)
 	{
-		switch(event.type)
-			case SDL_KEYDOWN:
-				switch (event.key.keysym.sym)
-				{
-					case SDLK_ESCAPE:
-						m_running = false;
-						break;
-				}
-				//case SDLK_UP:
-				//	DEBUG_MSG("Up Key Pressed");
-				//	SDL_SetRenderDrawColor(m_p_Renderer, 255, 0, 0, 255);
-				//	break;
-				//case SDLK_DOWN:
-				//	DEBUG_MSG("Down Key Pressed");
-				//	SDL_SetRenderDrawColor(m_p_Renderer, 0, 255, 0, 255);
-				//	break;
-				//case SDLK_LEFT:
-				//	DEBUG_MSG("Left Key Pressed");
-				//	SDL_SetRenderDrawColor(m_p_Renderer, 0, 0, 255, 255);
-				//	break;
-				//case SDLK_RIGHT:
-				//	DEBUG_MSG("Right Key Pressed");
-				//	SDL_SetRenderDrawColor(m_p_Renderer, 255, 255, 255, 255);
-				//	break;
-				//default:
-				//	SDL_SetRenderDrawColor(m_p_Renderer, 0, 0, 0, 255);
-				//	break;
-				//}
+		if (event.type == SDL_QUIT)
+		{
+			m_quit = true;
+		}
 	}
-}
-
-bool Game::IsRunning()
-{
-	return m_running;
-}
-
-void Game::UnloadContent()
-{
-	DEBUG_MSG("Unloading Content");
-	TextureManager::Instance()->cleanUpAll();
+	SceneManager::Instance()->onEvent(m_quit);
 }
 
 void Game::CleanUp()
@@ -132,4 +90,25 @@ void Game::CleanUp()
 	SDL_DestroyWindow(m_p_Window);
 	SDL_DestroyRenderer(m_p_Renderer);
 	SDL_Quit();
+}
+
+void Game::Loop()
+{
+	LTimer capTimer;
+	int frameNum = 0;
+
+	while (!m_quit)
+	{ 
+		capTimer.start();
+
+		HandleEvents();
+		Update();
+		Render();
+
+		int frameTicks = capTimer.getTicks();
+		if (frameTicks < SCREEN_TICKS_PER_FRAME)
+		{
+			SDL_Delay(SCREEN_TICKS_PER_FRAME - frameTicks);
+		}
+	}
 }
