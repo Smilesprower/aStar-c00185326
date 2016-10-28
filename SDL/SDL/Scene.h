@@ -10,8 +10,7 @@ class SceneManager;
 class Scene
 {
 public:
-
-	virtual ~Scene();
+	virtual ~Scene(){};
 	virtual void render(SDL_Renderer* renderer) = 0;
 	virtual void update(float deltaTime) = 0;
 	virtual void onEvent(bool &quit) = 0;

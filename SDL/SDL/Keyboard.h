@@ -15,9 +15,6 @@ public:
 	//True if the key was released this frame
 	bool keyReleased(int key);
 
-
-
-
 private:
 	int length;
 	//State of keyboard last frame
