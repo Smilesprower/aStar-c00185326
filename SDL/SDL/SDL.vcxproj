@@ -151,11 +151,13 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AStar.h" />
     <ClInclude Include="Debug.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="Keyboard.h" />
     <ClInclude Include="LTimer.h" />
     <ClInclude Include="MenuScene.h" />
+    <ClInclude Include="Node.h" />
     <ClInclude Include="ResourceIdentifier.h" />
     <ClInclude Include="Scene.h" />
     <ClInclude Include="SceneManager.h" />
@@ -164,10 +166,12 @@
     <ClInclude Include="TextureManager.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="AStar.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="Keyboard.cpp" />
     <ClCompile Include="LTimer.cpp" />
     <ClCompile Include="MenuScene.cpp" />
+    <ClCompile Include="Node.cpp" />
     <ClCompile Include="SceneManager.cpp" />
     <ClCompile Include="SDL.cpp" />
     <ClCompile Include="stdafx.cpp">
