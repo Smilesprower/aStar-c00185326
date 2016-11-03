@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "TextureManager.h"
 #include "SDL_image.h"
+#include "SDL_ttf.h"
 
 TextureManager * TextureManager::m_inst = nullptr;
 TextureManager * TextureManager::Instance()
@@ -15,11 +16,37 @@ TextureManager * TextureManager::Instance()
 
 bool TextureManager::load(std::string fileName, int id, SDL_Renderer * pRenderer)
 {
+
 	SDL_Surface* pTempSurface = IMG_Load(fileName.c_str());
 	if (pTempSurface == 0)
 	{
 		return false;
 	}
+
+	SDL_Texture* pTexture = SDL_CreateTextureFromSurface(pRenderer, pTempSurface);
+	SDL_FreeSurface(pTempSurface);
+
+	if (pTexture != 0)
+	{
+		m_textureMap[id] = pTexture;
+		return true;
+	}
+	// reaching here means something went wrong
+	return false;
+}
+
+bool TextureManager::loadFont(std::string message, int id, SDL_Renderer * pRenderer)
+{
+	// Initialize SDL_ttf library
+	if (TTF_Init() != 0)
+	{
+		SDL_Quit();
+		exit(1);
+	}
+	TTF_Font *font;
+	font = TTF_OpenFont("PressStart2P.ttf", 24);
+	SDL_Color White = { 255, 255, 255 }; 
+	SDL_Surface* pTempSurface = TTF_RenderText_Solid(font, message.c_str(), White);
 
 	SDL_Texture* pTexture = SDL_CreateTextureFromSurface(pRenderer, pTempSurface);
 	SDL_FreeSurface(pTempSurface);
@@ -48,6 +75,17 @@ void TextureManager::draw(int id, int x, int y, int w, int h,  SDL_Renderer * pR
 	// Source Rect is the part of texture we want to draw.
 	// Dest Rect is where we want to draw the rectangle.
 	SDL_RenderCopyEx(pRenderer, m_textureMap[id], &srcRect, &destRect, 0, nullptr, flip);
+}
+
+void TextureManager::drawMessage(int id, int x, int y, int w, int h, SDL_Renderer * pRenderer, SDL_RendererFlip flip)
+{
+	SDL_Rect destRect;
+
+	destRect.x = x;
+	destRect.y = y;
+	destRect.w = w;
+	destRect.h = h;
+	SDL_RenderCopy(pRenderer, m_textureMap[id], NULL, &destRect);
 }
 
 TextureManager::TextureManager()

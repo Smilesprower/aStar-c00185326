@@ -51,15 +51,27 @@ bool Game::Initialize(const char* title, int xpos, int ypos, int width, int heig
 	}
 
 	// Load Scenes
-	SceneManager::Instance()->addScene(new MenuScene(m_p_Renderer));
+	//SceneManager::Instance()->addScene(new MenuScene(m_p_Renderer));
+	SceneManager::Instance()->addScene(new GameScene(m_p_Renderer));
 
 	return true;
 }
 
+void Game::LoadContent()
+{
+}
+
+void Game::UnloadContent()
+{
+}
+
 void Game::Render()
 {
+	SDL_SetRenderDrawColor(m_p_Renderer, 0, 0, 0, 255);
 	SDL_RenderClear(m_p_Renderer);
+	// Draw Scene
 	SceneManager::Instance()->render(m_p_Renderer);
+
 	SDL_RenderPresent(m_p_Renderer);
 }
 

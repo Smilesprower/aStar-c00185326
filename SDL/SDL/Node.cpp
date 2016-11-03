@@ -6,6 +6,12 @@ Node::Node()
 {
 }
 
+Node::~Node()
+{
+	delete m_prevNode;
+	m_prevNode = nullptr;
+}
+
 Node::Node(int x, int y, int size, int index, bool walkable)
 	: m_walkable(walkable)
 	, m_open(false)
@@ -18,10 +24,12 @@ Node::Node(int x, int y, int size, int index, bool walkable)
 	, m_position(SDL_Point{ x * size, y * size })
 	, m_rect(SDL_Rect{ m_position.x, m_position.y, m_size, m_size })
 {
-	if (walkable)
-		m_color = SDL_Color{255,0,0,255 };
+	if (index == 0)
+		m_color = SDL_Color{ 0,255,255 };
+	else if (walkable)
+		m_color = SDL_Color{255,0,0};
 	else
-		m_color = SDL_Color{ 60,60,60,255 };
+		m_color = SDL_Color{ 60,60,60 };
 }
 
 bool Node::open() const

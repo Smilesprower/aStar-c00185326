@@ -15,7 +15,4 @@ public:
 	void loadContent(SDL_Renderer* renderer);
 
 private:
-
-	bool m_changeColor;
-
 };

@@ -4,7 +4,8 @@ namespace Textures
 	enum ID
 	{
 		Player,
-		Level
+		Level,
+		Text1,
 	};
 }
 namespace Scenes

@@ -14,12 +14,14 @@ class AStar {
 	};
 
 public:
+	AStar();
 	AStar(int numOfNodes, int numOfNodesPerAxis, int nodeDimensions);
 	~AStar();
 
-	std::vector<int> findPath(std::vector<Node> *m_nodes, int startIndex, int goalIndex);
+	std::vector<SDL_Point> findPath(std::vector<Node> *m_nodes, int startIndex, int goalIndex);
 	int getHeuristic(Node* currentNode, Node* goalNode);
 	int getNeighbourIndex(Node * current, int neighbourIndex);
+	void setUp(int numOfNodes, int numOfNodesPerAxis, int nodeSize);
 
 private:
 	int m_numOfNodes;
@@ -27,5 +29,5 @@ private:
 	int m_nodeDimensions;
 
 	int m_neighbourNode[4];
-	std::vector<int> createPath(Node* goalNode, Node * startNode);
+	std::vector<SDL_Point> createPath(Node* goalNode, Node * startNode);
 };

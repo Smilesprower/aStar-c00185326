@@ -6,6 +6,7 @@
 #include "LTimer.h"
 #include "TextureManager.h"
 #include "MenuScene.h"
+#include "GameScene.h"
 #include "ResourceIdentifier.h"
 
 class Game

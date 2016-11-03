@@ -5,6 +5,7 @@
 class Node {
 public:
 	Node();
+	~Node();
 	Node(int x, int y, int size, int index, bool walkable);
 	bool open() const;
 	bool close() const;
