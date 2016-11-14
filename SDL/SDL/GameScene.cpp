@@ -2,18 +2,29 @@
 #include "GameScene.h"
 
 GameScene::GameScene(SDL_Renderer* renderer)
-	: m_nodes(new std::vector<Node>())
+	: m_nodes(std::vector<Node*>(0))
 	, m_state(Intro)
 {
+
+	for (int i = 0; i < 1000; i++)
+	{
+		m_nodes.push_back(new Node());
+	}
 	loadContent(renderer);
 }
 
 GameScene::~GameScene()
 {
+	for (int i = 0; i < m_numOfNodes; i++)
+	{
+		delete m_nodes[i];
+		m_nodes[i] =  nullptr;
+	}
 }
 
 void GameScene::render(SDL_Renderer* renderer)
 {
+	int count = 0;
 	// Intro State
 	////////////////////////////
 	if (m_state == Intro)
@@ -26,9 +37,10 @@ void GameScene::render(SDL_Renderer* renderer)
 	{
 		for (int i = 0; i < m_numOfNodes; i++)
 		{
-			SDL_Color col = m_nodes->at(i).getColor();
-			SDL_SetRenderDrawColor(renderer, col.r, col.g, col.b, col.a);
-			SDL_RenderFillRect(renderer, &m_nodes->at(i).getRect());
+				SDL_Color col = m_nodes.at(i)->getColor();
+				SDL_SetRenderDrawColor(renderer, col.r, col.g, col.b, col.a);
+				SDL_RenderFillRect(renderer, &m_nodes.at(i)->getRect());
+				count++;
 		}
 
 		SDL_Color col = m_enemy.getColor();
@@ -50,14 +62,14 @@ void GameScene::update(float deltaTime)
 
 void GameScene::onEvent(bool &quit)
 {
-	if (Keyboard::Instance()->keyReleased(SDL_SCANCODE_ESCAPE))
+	if (Keyboard::Instance()->keyPressed(SDL_SCANCODE_ESCAPE))
 		quit = true;
-	if (Keyboard::Instance()->keyReleased(SDL_SCANCODE_A) && m_state == Intro)
+	if (Keyboard::Instance()->keyPressed(SDL_SCANCODE_A) && m_state == Intro)
 	{
 		setUp(100, 10, 50);
 		m_state = Run;
 	}
-	if (Keyboard::Instance()->keyReleased(SDL_SCANCODE_RETURN) && m_state == Run)
+	if (Keyboard::Instance()->keyPressed(SDL_SCANCODE_RETURN) && m_state == Run)
 	{
 		m_start = true;
 	}
@@ -78,7 +90,7 @@ void GameScene::loadContent(SDL_Renderer * renderer)
 }
 // Set up variables
 ////////////////////////////
-void GameScene::setUp(int non, int npa, int ns)
+void GameScene::setUp(int non, int npa, int ns) // Num of Nodes, Nodes per Axis, Node Size
 {
 	std::cout << "Setting Up" << std::endl;
 	m_start = false;
@@ -88,24 +100,20 @@ void GameScene::setUp(int non, int npa, int ns)
 	m_x = 0;
 	m_y = 0;
 
-	astar.setUp(m_numOfNodes, m_nodesPerAxis, m_nodeSize);
-	m_enemy.setUp(SDL_Point{8, 9}, m_nodesPerAxis, m_nodeSize);
 
 	for (int i = 0; i < m_numOfNodes; i++)
 	{
-		if (i % (2 + (m_y * m_nodesPerAxis)) == 0 && i > m_nodesPerAxis && i < m_numOfNodes - m_nodesPerAxis
-			|| i % (4 + (m_y * m_nodesPerAxis)) == 0 && i > m_nodesPerAxis && i < m_numOfNodes - m_nodesPerAxis
-			|| i % (6 + (m_y * m_nodesPerAxis)) == 0 && i > m_nodesPerAxis && i < m_numOfNodes - m_nodesPerAxis
-			|| i % (8 + (m_y * m_nodesPerAxis)) == 0 && i > m_nodesPerAxis && i < m_numOfNodes - m_nodesPerAxis)
-		{
-			Node temp(m_x, m_y, m_nodeSize, i, false);
-			m_nodes->push_back(temp);
-		}
-		else
-		{
-			Node temp(m_x, m_y, m_nodeSize, i, true);
-			m_nodes->push_back(temp);
-		}
+		//if (i % (2 + (m_y * m_nodesPerAxis)) == 0 && i > m_nodesPerAxis && i < m_numOfNodes - m_nodesPerAxis
+		//	|| i % (4 + (m_y * m_nodesPerAxis)) == 0 && i > m_nodesPerAxis && i < m_numOfNodes - m_nodesPerAxis
+		//	|| i % (6 + (m_y * m_nodesPerAxis)) == 0 && i > m_nodesPerAxis && i < m_numOfNodes - m_nodesPerAxis
+		//	|| i % (8 + (m_y * m_nodesPerAxis)) == 0 && i > m_nodesPerAxis && i < m_numOfNodes - m_nodesPerAxis)
+		//{
+		//	m_nodes[i]->setUp(m_x, m_y, m_nodeSize, i, false);
+		//}
+		//else
+		//{
+			m_nodes[i]->setUp(m_x, m_y, m_nodeSize, i, true);
+		//}
 		m_x++;
 		if (m_x >= m_nodesPerAxis)
 		{
@@ -113,14 +121,18 @@ void GameScene::setUp(int non, int npa, int ns)
 			m_y++;
 		}
 	}
+	astar.setUp(m_numOfNodes, m_nodesPerAxis, m_nodeSize);
+	m_enemy.setUp(SDL_Point{ 8, 9 }, m_nodesPerAxis, m_nodeSize);
 	std::cout << "Done" << std::endl;
 }
 // Reset up variables
 ////////////////////////////
 void GameScene::reset()
 {
+	for (int i = 0; i < m_numOfNodes; i++)
+		m_nodes.at(i)->setUsing(false);
+
 	m_state = Intro;
-	m_nodes->clear();
 	m_start = false;
 	m_numOfNodes = 0;
 	m_nodesPerAxis = 0;

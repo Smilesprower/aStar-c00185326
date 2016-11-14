@@ -40,6 +40,8 @@ private:
 	Enemy m_enemy;
 
 	AStar astar;
-	std::vector<Node> *m_nodes;
+
+	std::vector<Node*> m_nodes;
+	//std::vector<Node> *m_nodes;
 	std::vector<SDL_Point> m_path;
 };

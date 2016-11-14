@@ -6,7 +6,6 @@ class Node {
 public:
 	Node();
 	~Node();
-	Node(int x, int y, int size, int index, bool walkable);
 	bool open() const;
 	bool close() const;
 	int getCcost() const;
@@ -18,18 +17,21 @@ public:
 	void setFcost(int fCost);
 	void setGcost(int gCost);
 	void setPrevious(Node* previous);
-	void reset();
+	void setUp(int x, int y, int size, int index, bool walkable);
 	int getIndex();
 	SDL_Rect getRect();
 	SDL_Point getPosition();
 	SDL_Color getColor();
 	void setColor(SDL_Color color);
+	bool getUsing();
+	void setUsing(bool);
 
 	//overloads
 	bool operator<(const Node&) const;
 	bool operator==(const Node&) const;
 
 private:
+	bool m_using;
 	bool m_walkable;
 	bool m_open;
 	bool m_close;

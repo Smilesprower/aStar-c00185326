@@ -3,6 +3,7 @@
 
 
 Node::Node()
+	: m_using(false)
 {
 }
 
@@ -10,26 +11,6 @@ Node::~Node()
 {
 	delete m_prevNode;
 	m_prevNode = nullptr;
-}
-
-Node::Node(int x, int y, int size, int index, bool walkable)
-	: m_walkable(walkable)
-	, m_open(false)
-	, m_close(false)
-	, m_fCost(std::numeric_limits<int>::max())
-	, m_gCost(std::numeric_limits<int>::max())
-	, m_index(index)
-	, m_prevNode(0)
-	, m_size(size)
-	, m_position(SDL_Point{ x * size, y * size })
-	, m_rect(SDL_Rect{ m_position.x, m_position.y, m_size, m_size })
-{
-	if (index == 0)
-		m_color = SDL_Color{ 0,255,255 };
-	else if (walkable)
-		m_color = SDL_Color{255,0,0};
-	else
-		m_color = SDL_Color{ 60,60,60 };
 }
 
 bool Node::open() const
@@ -87,13 +68,26 @@ void Node::setPrevious(Node * previous)
 	m_prevNode = previous;
 }
 
-void Node::reset()
+void Node::setUp(int x, int y, int size, int index, bool walkable)
 {
-	m_prevNode = 0;
+	m_using = true;
+	m_walkable = walkable;
+	m_open = false;
+	m_close = false;
 	m_fCost = std::numeric_limits<int>::max();
 	m_gCost = std::numeric_limits<int>::max();
-	m_close = false;
-	m_open = false;
+	m_index = index;
+	m_prevNode = 0;
+	m_size = size;
+	m_position = SDL_Point{ x * size, y * size };
+	m_rect = SDL_Rect{ m_position.x, m_position.y, m_size, m_size };
+	
+	if (index == 0)
+		m_color = SDL_Color{ 0,255,255 };
+	else if (walkable)
+		m_color = SDL_Color{ 255,0,0 };
+	else
+		m_color = SDL_Color{ 60,60,60 };
 }
 int Node::getIndex()
 {
@@ -114,6 +108,14 @@ SDL_Color Node::getColor()
 void Node::setColor(SDL_Color color)
 {
 	m_color = color;
+}
+bool Node::getUsing()
+{
+	return m_using;
+}
+void Node::setUsing(bool)
+{
+	m_using = false;
 }
 bool Node::operator<(const Node& n) const {
 	return n.getFcost() < this->m_fCost;

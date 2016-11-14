@@ -24,18 +24,18 @@ AStar::~AStar()
 {
 }
 
-std::vector<SDL_Point> AStar::findPath(std::vector<Node> *m_nodes, int startIndex, int goalIndex)
+std::vector<SDL_Point> AStar::findPath(std::vector<Node*> m_nodes, int startIndex, int goalIndex)
 {
-	Node* start = &m_nodes->at(startIndex);
-	Node* goal = &m_nodes->at(goalIndex);
+	Node* start = m_nodes.at(startIndex);
+	Node* goal = m_nodes.at(goalIndex);
 
 	if (start != 0 && goal != 0)
 	{
-		for (int i = 0; i < m_numOfNodes; i++)
-		{
-			if (&m_nodes[i] != 0)
-				m_nodes->at(i).reset();
-		}
+		//for (int i = 0; i < m_numOfNodes; i++)
+		//{
+		//	if (&m_nodes[i] != 0)
+		//		m_nodes->at(i).reset();
+		//}
 
 		std::priority_queue<std::pair<int, int>, std::vector<std::pair<int, int>>, NodeSearchCostComparer> openset;
 		start->setGcost(0);
@@ -47,7 +47,7 @@ std::vector<SDL_Point> AStar::findPath(std::vector<Node> *m_nodes, int startInde
 
 		while (openset.size() != 0)
 		{
-			Node* current = &m_nodes->at(openset.top().second);
+			Node* current = m_nodes.at(openset.top().second);
 			openset.pop();
 			if (current == goal)
 			{
@@ -62,7 +62,7 @@ std::vector<SDL_Point> AStar::findPath(std::vector<Node> *m_nodes, int startInde
 
 				Node* neighbour;
 				if (neighbourIndex == -1){ neighbour = 0; }
-				else { neighbour = &m_nodes->at(neighbourIndex); }
+				else { neighbour = m_nodes.at(neighbourIndex); }
 
 				if (neighbour == 0 || neighbour->close()
 					|| neighbour == current->getPrevious()
