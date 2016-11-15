@@ -51,13 +51,17 @@ void GameScene::render(SDL_Renderer* renderer)
 
 void GameScene::update(float deltaTime)
 {
+	std::cout << m_start << std::endl;
 	if (m_start)
 	{
 		// Goal Node, Enemy Start Node
 		m_enemy.SetPath(astar.findPath(m_nodes, 0, m_enemy.getStartNode()));
 		m_start = false;
 	}
-	m_enemy.update(deltaTime);
+	if (!m_enemy.isFinished())
+		m_enemy.update(deltaTime);
+	else
+		reset();
 }
 
 void GameScene::onEvent(bool &quit)
@@ -103,17 +107,16 @@ void GameScene::setUp(int non, int npa, int ns) // Num of Nodes, Nodes per Axis,
 
 	for (int i = 0; i < m_numOfNodes; i++)
 	{
-		//if (i % (2 + (m_y * m_nodesPerAxis)) == 0 && i > m_nodesPerAxis && i < m_numOfNodes - m_nodesPerAxis
-		//	|| i % (4 + (m_y * m_nodesPerAxis)) == 0 && i > m_nodesPerAxis && i < m_numOfNodes - m_nodesPerAxis
-		//	|| i % (6 + (m_y * m_nodesPerAxis)) == 0 && i > m_nodesPerAxis && i < m_numOfNodes - m_nodesPerAxis
-		//	|| i % (8 + (m_y * m_nodesPerAxis)) == 0 && i > m_nodesPerAxis && i < m_numOfNodes - m_nodesPerAxis)
-		//{
-		//	m_nodes[i]->setUp(m_x, m_y, m_nodeSize, i, false);
-		//}
-		//else
-		//{
+		if (i % (2 + (m_y * m_nodesPerAxis)) == 0 && i > m_nodesPerAxis && i < m_numOfNodes - m_nodesPerAxis
+			|| i % (4 + (m_y * m_nodesPerAxis)) == 0 && i > m_nodesPerAxis && i < m_numOfNodes - m_nodesPerAxis
+			|| i % (6 + (m_y * m_nodesPerAxis)) == 0 && i > m_nodesPerAxis && i < m_numOfNodes - m_nodesPerAxis)
+		{
+			m_nodes[i]->setUp(m_x, m_y, m_nodeSize, i, false);
+		}
+		else
+		{
 			m_nodes[i]->setUp(m_x, m_y, m_nodeSize, i, true);
-		//}
+		}
 		m_x++;
 		if (m_x >= m_nodesPerAxis)
 		{
@@ -132,6 +135,7 @@ void GameScene::reset()
 	for (int i = 0; i < m_numOfNodes; i++)
 		m_nodes.at(i)->setUsing(false);
 
+	m_enemy.reset();
 	m_state = Intro;
 	m_start = false;
 	m_numOfNodes = 0;

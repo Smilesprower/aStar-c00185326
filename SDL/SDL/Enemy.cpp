@@ -34,6 +34,10 @@ void Enemy::update(float deltaTime)
 				m_nextPath = m_path.at(m_pathCount);
 				m_pathCount++;
 			}
+			else
+			{
+				m_finished = true;
+			}
 		}
 		if (m_nextPath.x > m_bounds.x)
 			m_bounds.x += SPEED * deltaTime;
@@ -71,3 +75,16 @@ int Enemy::getStartNode()
 {
 	return m_startTileNo;
 }
+
+bool Enemy::isFinished()
+{
+	return m_finished;
+}
+
+void Enemy::reset()
+{
+	m_pathCount = 0;
+	m_start = false;
+	m_finished = false;
+}
+

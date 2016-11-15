@@ -14,6 +14,8 @@ public:
 	SDL_Rect getRect();
 	void SetPath(std::vector<SDL_Point> path);
 	int getStartNode();
+	bool isFinished();
+	void reset();
 
 private:
 	const int SPEED = 10;
