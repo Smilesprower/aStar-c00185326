@@ -21,7 +21,6 @@ public:
 	std::vector<SDL_Point> findPath(std::vector<Node*> m_nodes, int startIndex, int goalIndex);
 	int getHeuristic(Node* currentNode, Node* goalNode);
 	int getNeighbourIndex(Node * current, int neighbourIndex);
-	void setUp(int numOfNodes, int numOfNodesPerAxis, int nodeSize);
 
 private:
 	int m_numOfNodes;

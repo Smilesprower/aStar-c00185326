@@ -3,7 +3,7 @@
 
 
 Enemy::Enemy()
-	: m_color(SDL_Color{ 0,0,255})
+	: m_color(SDL_Color{ 255,0,0})
 	, m_pathCount(0)
 	, m_start(false)
 	, m_finished(false)
@@ -18,16 +18,16 @@ Enemy::~Enemy()
 void Enemy::setUp(SDL_Point pos, int m_nodesPerAxis, int size)
 {
 	m_startTileNo = pos.x + m_nodesPerAxis * pos.y;
-	m_bounds.x = pos.x * size;
-	m_bounds.y = pos.y * size;
-	m_bounds.h = size;
-	m_bounds.w = size;
+	m_rect.x = pos.x * size;
+	m_rect.y = pos.y * size;
+	m_rect.h = size;
+	m_rect.w = size;
 }
 void Enemy::update(float deltaTime)
 {
 	if (m_start)
 	{
-		if (m_nextPath.x == m_bounds.x && m_nextPath.y == m_bounds.y)
+		if (m_nextPath.x == m_rect.x && m_nextPath.y == m_rect.y)
 		{
 			if (m_pathCount < m_numOfPaths)
 			{
@@ -39,14 +39,14 @@ void Enemy::update(float deltaTime)
 				m_finished = true;
 			}
 		}
-		if (m_nextPath.x > m_bounds.x)
-			m_bounds.x += SPEED * deltaTime;
-		else if (m_nextPath.x < m_bounds.x)
-			m_bounds.x -= SPEED * deltaTime;
-		else if (m_nextPath.y < m_bounds.y)
-			m_bounds.y -= SPEED * deltaTime;
-		else if (m_nextPath.y > m_bounds.y)
-			m_bounds.y += SPEED * deltaTime;
+		if (m_nextPath.x > m_rect.x)
+			m_rect.x += SPEED;
+		else if (m_nextPath.x < m_rect.x)
+			m_rect.x -= SPEED;
+		else if (m_nextPath.y < m_rect.y)
+			m_rect.y -= SPEED;
+		else if (m_nextPath.y > m_rect.y)
+			m_rect.y += SPEED;
 	}
 }
 bool Enemy::start()
@@ -57,9 +57,10 @@ SDL_Color Enemy::getColor()
 {
 	return m_color;
 }
-SDL_Rect Enemy::getRect()
+SDL_Rect Enemy::getRect(SDL_Rect camera)
 {
-	return m_bounds;
+	SDL_Rect temp{ m_rect.x - camera.x,m_rect.y - camera.y, m_rect.w, m_rect.h };
+	return temp;
 }
 
 void Enemy::SetPath(std::vector<SDL_Point> path)

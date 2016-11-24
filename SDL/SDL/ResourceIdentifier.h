@@ -3,16 +3,14 @@ namespace Textures
 {
 	enum ID
 	{
-		Player,
-		Level,
-		Text1,
+		Tiles,
+		Info
 	};
 }
 namespace Scenes
 {
 	enum ID
 	{
-		MenuScene,
-		GameScene
+		GameScene,
 	};
 }

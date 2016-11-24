@@ -9,11 +9,11 @@ public:
 	void update();
 
 	//True if a key is pressed
-	bool keyDown(int key);
+	int keyDown(int key);
 	//True if the key was pressed this frame
-	bool keyPressed(int key);
+	int keyPressed(int key);
 	//True if the key was released this frame
-	bool keyReleased(int key);
+	int keyReleased(int key);
 
 private:
 	int length;

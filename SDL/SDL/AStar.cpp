@@ -2,7 +2,7 @@
 #include "AStar.h"
 
 const int NEIGHBOUR_COUNT = 4;
-const int COST = 1;
+const int COST = 5;
 
 
 AStar::AStar()
@@ -31,12 +31,6 @@ std::vector<SDL_Point> AStar::findPath(std::vector<Node*> m_nodes, int startInde
 
 	if (start != 0 && goal != 0)
 	{
-		//for (int i = 0; i < m_numOfNodes; i++)
-		//{
-		//	if (&m_nodes[i] != 0)
-		//		m_nodes->at(i).reset();
-		//}
-
 		std::priority_queue<std::pair<int, int>, std::vector<std::pair<int, int>>, NodeSearchCostComparer> openset;
 		start->setGcost(0);
 		start->setFcost(getHeuristic(start, goal));
@@ -80,7 +74,6 @@ std::vector<SDL_Point> AStar::findPath(std::vector<Node*> m_nodes, int startInde
 
 				if (neighbour->open() == false)
 				{
-					neighbour->setColor(SDL_Color{ 100,0,100,255 });
 					neighbour->setOpen(true);
 					openset.push(std::pair<int, int>(neighbour->getFcost(), neighbourIndex));
 				}
@@ -128,24 +121,11 @@ int AStar::getNeighbourIndex(Node * current, int neighbourIndex)
 	return index;
 }
 
-void AStar::setUp(int numOfNodes, int numOfNodesPerAxis, int nodeSize)
-{
-	m_numOfNodes = numOfNodes;
-	m_numOfNodesPerAxis = numOfNodesPerAxis;
-	m_nodeDimensions = nodeSize;
-	
-	m_neighbourNode[0] = 1; // Right
-	m_neighbourNode[1] = -1; // Left
-	m_neighbourNode[2] = numOfNodesPerAxis; // Down
-	m_neighbourNode[3] = -numOfNodesPerAxis; // Up
-}
-
 std::vector<SDL_Point> AStar::createPath(Node * goalNode, Node * startNode)
 {
 	std::vector<SDL_Point> path;
 	for (Node* previous = goalNode; previous->getPrevious() != 0; previous = previous->getPrevious())
 	{
-		previous->setColor(SDL_Color{ 0,255,0,255 });
 		path.push_back(previous->getPosition());
 	}
 	path.push_back(startNode->getPosition());

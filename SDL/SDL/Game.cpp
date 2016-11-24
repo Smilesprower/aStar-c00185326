@@ -52,7 +52,7 @@ bool Game::Initialize(const char* title, int xpos, int ypos, int width, int heig
 
 	// Load Scenes
 	//SceneManager::Instance()->addScene(new MenuScene(m_p_Renderer));
-	SceneManager::Instance()->addScene(new GameScene(m_p_Renderer));
+	SceneManager::Instance()->addScene(new GameScene(m_p_Renderer, width, height));
 
 	return true;
 }

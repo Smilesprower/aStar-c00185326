@@ -30,17 +30,17 @@ void Keyboard::update()
 	currentKey = SDL_GetKeyboardState(NULL);
 }
 
-bool Keyboard::keyDown(int key)
+int Keyboard::keyDown(int key)
 {
 	return currentKey[key];
 }
 
-bool Keyboard::keyPressed(int key)
+int Keyboard::keyPressed(int key)
 {
 	return (currentKey[key] && !previousKey[key]);
 }
 
-bool Keyboard::keyReleased(int key)
+int Keyboard::keyReleased(int key)
 {
 	return (!currentKey[key] && previousKey[key]);
 }

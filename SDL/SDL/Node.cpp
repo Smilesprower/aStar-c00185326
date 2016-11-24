@@ -2,8 +2,12 @@
 #include "Node.h"
 
 
-Node::Node()
-	: m_using(false)
+Node::Node(int index, int xPos, int yPos, int NODESIZE)
+	: m_index(index)
+	, m_size(NODESIZE)
+	, m_tileID{0, 0}
+	, m_position { xPos * m_size, yPos * m_size }
+	, m_rect { m_position.x, m_position.y, m_size, m_size }
 {
 }
 
@@ -68,54 +72,37 @@ void Node::setPrevious(Node * previous)
 	m_prevNode = previous;
 }
 
-void Node::setUp(int x, int y, int size, int index, bool walkable)
+void Node::setUp(bool walkable)
 {
-	m_using = true;
 	m_walkable = walkable;
 	m_open = false;
 	m_close = false;
 	m_fCost = std::numeric_limits<int>::max();
 	m_gCost = std::numeric_limits<int>::max();
-	m_index = index;
 	m_prevNode = 0;
-	m_size = size;
-	m_position = SDL_Point{ x * size, y * size };
-	m_rect = SDL_Rect{ m_position.x, m_position.y, m_size, m_size };
-	
-	if (index == 0)
-		m_color = SDL_Color{ 0,255,255 };
-	else if (walkable)
-		m_color = SDL_Color{ 255,0,0 };
+
+	// May need to remove if drawing gets slow
+	if (walkable)
+		m_tileID.x = m_index % 3;
 	else
-		m_color = SDL_Color{ 60,60,60 };
+		m_tileID.x = 3;
 }
 int Node::getIndex()
 {
 	return m_index;
 }
-SDL_Rect Node::getRect()
+SDL_Rect Node::getRect(SDL_Rect camera)
 {
-	return m_rect;
+	SDL_Rect temp{ m_rect.x - camera.x,m_rect.y - camera.y, m_rect.w, m_rect.h };
+	return temp;
 }
 SDL_Point Node::getPosition()
 {
 	return m_position;
 }
-SDL_Color Node::getColor()
+SDL_Point Node::getTileID()
 {
-	return m_color;
-}
-void Node::setColor(SDL_Color color)
-{
-	m_color = color;
-}
-bool Node::getUsing()
-{
-	return m_using;
-}
-void Node::setUsing(bool)
-{
-	m_using = false;
+	return m_tileID;
 }
 bool Node::operator<(const Node& n) const {
 	return n.getFcost() < this->m_fCost;

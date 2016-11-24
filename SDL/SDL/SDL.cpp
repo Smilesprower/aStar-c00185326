@@ -4,16 +4,13 @@
 #include "stdafx.h"
 #include <SDL.h>
 #include <SDL_image.h>
-#include <iostream>
 #include "Game.h"
-#include <thread>
-#include <string>
 
 int main(int argc, char** argv) {
 
 	Game* game = new Game();
 
-	game->Initialize("DGPP Skelatol", 300, 100, 800, 600, SDL_WINDOW_INPUT_FOCUS);
+	game->Initialize("A-Star*", 300, 100, 800, 600, SDL_WINDOW_INPUT_FOCUS);
 	game->Loop();
 	game->CleanUp();
 
