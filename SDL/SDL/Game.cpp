@@ -77,6 +77,7 @@ void Game::Render()
 
 void Game::Update()
 {
+
 	unsigned int currentTime = LTimer::gameTime();
 	float deltaTime = (currentTime - m_lastTime) / 1000.f;
 	SceneManager::Instance()->update(deltaTime);

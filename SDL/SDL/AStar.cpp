@@ -2,7 +2,7 @@
 #include "AStar.h"
 
 const int NEIGHBOUR_COUNT = 4;
-const int COST = 5;
+const int COST = 1;
 
 
 AStar::AStar()
@@ -74,6 +74,7 @@ std::vector<SDL_Point> AStar::findPath(std::vector<Node*> m_nodes, int startInde
 
 				if (neighbour->open() == false)
 				{
+					neighbour->setTileID(3);
 					neighbour->setOpen(true);
 					openset.push(std::pair<int, int>(neighbour->getFcost(), neighbourIndex));
 				}
@@ -126,6 +127,7 @@ std::vector<SDL_Point> AStar::createPath(Node * goalNode, Node * startNode)
 	std::vector<SDL_Point> path;
 	for (Node* previous = goalNode; previous->getPrevious() != 0; previous = previous->getPrevious())
 	{
+		previous->setTileID(4);
 		path.push_back(previous->getPosition());
 	}
 	path.push_back(startNode->getPosition());

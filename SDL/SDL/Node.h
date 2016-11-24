@@ -22,6 +22,7 @@ public:
 	SDL_Rect getRect(SDL_Rect camera);
 	SDL_Point getPosition();
 	SDL_Point getTileID();
+	void setTileID(int ID);
 
 	//overloads
 	bool operator<(const Node&) const;

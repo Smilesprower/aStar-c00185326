@@ -5,7 +5,7 @@
 Node::Node(int index, int xPos, int yPos, int NODESIZE)
 	: m_index(index)
 	, m_size(NODESIZE)
-	, m_tileID{0, 0}
+	, m_tileID{1, 0}
 	, m_position { xPos * m_size, yPos * m_size }
 	, m_rect { m_position.x, m_position.y, m_size, m_size }
 {
@@ -13,8 +13,6 @@ Node::Node(int index, int xPos, int yPos, int NODESIZE)
 
 Node::~Node()
 {
-	delete m_prevNode;
-	m_prevNode = nullptr;
 }
 
 bool Node::open() const
@@ -85,7 +83,7 @@ void Node::setUp(bool walkable)
 	if (walkable)
 		m_tileID.x = m_index % 3;
 	else
-		m_tileID.x = 3;
+		m_tileID.x = 5;
 }
 int Node::getIndex()
 {
@@ -103,6 +101,10 @@ SDL_Point Node::getPosition()
 SDL_Point Node::getTileID()
 {
 	return m_tileID;
+}
+void Node::setTileID(int ID)
+{
+	m_tileID.x = ID;
 }
 bool Node::operator<(const Node& n) const {
 	return n.getFcost() < this->m_fCost;

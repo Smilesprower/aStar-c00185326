@@ -159,6 +159,7 @@
     <ClInclude Include="Keyboard.h" />
     <ClInclude Include="LTimer.h" />
     <ClInclude Include="Node.h" />
+    <ClInclude Include="Player.h" />
     <ClInclude Include="ResourceIdentifier.h" />
     <ClInclude Include="Scene.h" />
     <ClInclude Include="SceneManager.h" />
@@ -174,6 +175,7 @@
     <ClCompile Include="Keyboard.cpp" />
     <ClCompile Include="LTimer.cpp" />
     <ClCompile Include="Node.cpp" />
+    <ClCompile Include="Player.cpp" />
     <ClCompile Include="SceneManager.cpp" />
     <ClCompile Include="SDL.cpp" />
     <ClCompile Include="stdafx.cpp">
