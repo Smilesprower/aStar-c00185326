@@ -24,31 +24,31 @@ AStar::~AStar()
 {
 }
 
-std::vector<SDL_Point> AStar::findPath(std::vector<Node*> m_nodes, int startIndex, int goalIndex)
+std::vector<SDL_Point> AStar::findPath(std::vector<Node*> *m_nodes, int startIndex, int goalIndex, int ID)
 {
-	Node* start = m_nodes.at(startIndex);
-	Node* goal = m_nodes.at(goalIndex);
+	Node* start = m_nodes->at(startIndex);
+	Node* goal = m_nodes->at(goalIndex);
 
 	if (start != 0 && goal != 0)
 	{
 		std::priority_queue<std::pair<int, int>, std::vector<std::pair<int, int>>, NodeSearchCostComparer> openset;
-		start->setGcost(0);
-		start->setFcost(getHeuristic(start, goal));
-		start->setOpen(true);
-		openset.push(std::pair<int, int>(start->getFcost(), startIndex));
+		start->setGcost(0, ID);
+		start->setFcost(getHeuristic(start, goal), ID);
+		start->setOpen(true, ID);
+		openset.push(std::pair<int, int>(start->getFcost(ID), startIndex));
 
 		int previousCost = 0;
 
 		while (openset.size() != 0)
 		{
-			Node* current = m_nodes.at(openset.top().second);
+			Node* current = m_nodes->at(openset.top().second);
 			openset.pop();
 			if (current == goal)
 			{
-				return createPath(goal, start);
+				return createPath(goal, start, ID);
 			}
-			current->setOpen(false); 
-			current->setClose(true); 
+			current->setOpen(false, ID); 
+			current->setClose(true, ID);
 
 			for (int i = 0; i < NEIGHBOUR_COUNT; i++)
 			{
@@ -56,27 +56,27 @@ std::vector<SDL_Point> AStar::findPath(std::vector<Node*> m_nodes, int startInde
 
 				Node* neighbour;
 				if (neighbourIndex == -1){ neighbour = 0; }
-				else { neighbour = m_nodes.at(neighbourIndex); }
+				else { neighbour = m_nodes->at(neighbourIndex); }
 
-				if (neighbour == 0 || neighbour->close()
-					|| neighbour == current->getPrevious()
+				if (neighbour == 0 || neighbour->close(ID)
+					|| neighbour == current->getPrevious(ID)
 					|| neighbour->walkable() == false)
 				{
 					continue;
 				}
-				int tenativeGCost = current->getCcost() + COST;
-				if (tenativeGCost <= neighbour->getCcost())
+				int tenativeGCost = current->getCcost(ID) + COST;
+				if (tenativeGCost <= neighbour->getCcost(ID))
 				{
-					neighbour->setPrevious(current);
-					neighbour->setGcost(tenativeGCost);
-					neighbour->setFcost(neighbour->getCcost() + getHeuristic(neighbour, goal));
+					neighbour->setPrevious(current, ID);
+					neighbour->setGcost(tenativeGCost, ID);
+					neighbour->setFcost(neighbour->getCcost(ID) + getHeuristic(neighbour, goal), ID);
 				}
 
-				if (neighbour->open() == false)
+				if (neighbour->open(ID) == false)
 				{
 					neighbour->setTileID(3);
-					neighbour->setOpen(true);
-					openset.push(std::pair<int, int>(neighbour->getFcost(), neighbourIndex));
+					neighbour->setOpen(true, ID);
+					openset.push(std::pair<int, int>(neighbour->getFcost(ID), neighbourIndex));
 				}
 				previousCost = tenativeGCost;
 			}
@@ -122,10 +122,10 @@ int AStar::getNeighbourIndex(Node * current, int neighbourIndex)
 	return index;
 }
 
-std::vector<SDL_Point> AStar::createPath(Node * goalNode, Node * startNode)
+std::vector<SDL_Point> AStar::createPath(Node * goalNode, Node * startNode, int ID)
 {
 	std::vector<SDL_Point> path;
-	for (Node* previous = goalNode; previous->getPrevious() != 0; previous = previous->getPrevious())
+	for (Node* previous = goalNode; previous->getPrevious(ID) != 0; previous = previous->getPrevious(ID))
 	{
 		previous->setTileID(4);
 		path.push_back(previous->getPosition());

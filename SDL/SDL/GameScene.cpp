@@ -58,6 +58,7 @@ void GameScene::render(SDL_Renderer* renderer)
 		int lastNodeX = startNodeX + MAX_NUM_PER_ROW - 1;				// Last node in the X direction
 		int xCounter = startNodeX;										// Holds the count for num of nodes in the X direction
 
+		m_sourceRect.y = 0;
 		for (int i = 0; i < MAX_NUM_OF_DRAWABLE_NODES; i++)
 		{
 			if (xCounter > lastNodeX)
@@ -66,9 +67,8 @@ void GameScene::render(SDL_Renderer* renderer)
 				xCounter = startNodeX;									// Reset count for num of nodes in the X direction
 			}
 			int currentNode = xCounter + startNodeY;
-			SDL_Point temp = m_nodes[currentNode]->getTileID();
-			m_sourceRect.x = temp.x * NODE_SIZE;
-			m_sourceRect.y = temp.y * NODE_SIZE;
+			int temp = m_nodes[currentNode]->getTileID();
+			m_sourceRect.x = temp * NODE_SIZE;
 
 			SDL_RenderCopyEx(renderer, m_texture, &m_sourceRect, &m_nodes[currentNode]->getRect(m_camera), 0, nullptr, SDL_RendererFlip::SDL_FLIP_NONE);
 			xCounter++;
@@ -90,14 +90,18 @@ void GameScene::update(float deltaTime)
 {
 	if (m_start)
 	{
-		//int x = SDL_GetTicks();
-		m_enemies[0]->SetPath(m_astar.findPath(m_nodes, 0, m_enemies[0]->getStartNode()));
-		//int y = SDL_GetTicks();
-		//std::cout << y - x << std::endl;
+		int x = SDL_GetTicks();
+		m_enemies[0]->SetPath(m_astar.findPath(&m_nodes, 0, m_enemies[0]->getStartNode(),0));
+		m_enemies[1]->SetPath(m_astar.findPath(&m_nodes, 0, m_enemies[1]->getStartNode(), 1));
+		int y = SDL_GetTicks();
+		std::cout << y - x << std::endl;
 		m_start = false;
 	}
 	if (!m_enemies[0]->isFinished())
+	{
 		m_enemies[0]->update(deltaTime);
+		m_enemies[1]->update(deltaTime);
+	}
 	else
 		reset();
 }
@@ -172,7 +176,7 @@ void GameScene::setUp(int non, int npa, int nae) // Num of Nodes, Nodes per Axis
 	// Reset the nodes I need
 	for (int i = 0; i < m_numOfNodes; i++)
 	{
-		// Fix up walls
+		//// Fix up walls
 		if (m_x + m_y == m_wallStartPoint[0]+ m_y && m_y > 1)
 			m_nodes[m_x + m_y]->setUp(false);
 		else if (m_x + m_y == m_wallStartPoint[1] + m_y && m_y < endPoint)
@@ -193,11 +197,15 @@ void GameScene::setUp(int non, int npa, int nae) // Num of Nodes, Nodes per Axis
 	m_worldWidth = m_nodesPerAxis * NODE_SIZE;
 	m_worldHeight = (m_numOfNodes / m_nodesPerAxis) * NODE_SIZE;
 
+	//m_enemies[0]->setUp(SDL_Point{ 10,10 }, MAX_NODES_PER_AXIS, NODE_SIZE);
 	// Need some way of placing 500 enemies
-	for (int i = 0; i < m_numOfActiveEnemies; i++)
-	{
-		m_enemies[i]->setUp(SDL_Point{ 35+i, 29 }, MAX_NODES_PER_AXIS, NODE_SIZE);
-	}
+
+	m_enemies[0]->setUp(SDL_Point{ 35, 29 }, MAX_NODES_PER_AXIS);
+	m_enemies[1]->setUp(SDL_Point{ 36, 0 }, MAX_NODES_PER_AXIS);
+	//for (int i = 0; i < m_numOfActiveEnemies; i++)
+	//{
+	//	m_enemies[i]->setUp(SDL_Point{ 35+i, 29 }, MAX_NODES_PER_AXIS, NODE_SIZE);
+	//}
 
 
 	std::cout << "Done" << std::endl;

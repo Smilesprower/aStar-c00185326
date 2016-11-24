@@ -16,7 +16,7 @@ public:
 	};
 
 
-	void setUp(SDL_Point pos, int m_nodesPerAxis, int size);
+	void setUp(SDL_Point pos, int m_nodesPerAxis);
 	void update(float deltaTime);
 	bool start();
 	SDL_Rect getRect(SDL_Rect camera);

@@ -7,8 +7,9 @@ Enemy::Enemy(int size)
 	, m_start(false)
 	, m_finished(false)
 	, m_active(false)
-	, m_size(size)
 	, m_tileID{ Up, 1 }
+	, m_size(size)
+	, m_rect{0, 0, size, size}
 {
 }
 
@@ -17,14 +18,12 @@ Enemy::~Enemy()
 {
 }
 
-void Enemy::setUp(SDL_Point pos, int m_nodesPerAxis, int size)
+void Enemy::setUp(SDL_Point pos, int m_nodesPerAxis)
 {
 	m_active = true;
 	m_startTileNo = pos.x + m_nodesPerAxis * pos.y;
-	m_rect.x = pos.x * size;
-	m_rect.y = pos.y * size;
-	m_rect.h = size;
-	m_rect.w = size;
+	m_rect.x = pos.x * m_size;
+	m_rect.y = pos.y * m_size;
 }
 void Enemy::update(float deltaTime)
 {

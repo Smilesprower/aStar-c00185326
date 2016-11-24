@@ -1,43 +1,41 @@
 #pragma once
 #include "SDL.h"
+#include<vector>
 #include <limits>
 
 class Node {
 public:
 	Node(int index, int xPos, int yPos, int NODE_SIZE);
 	~Node();
-	bool open() const;
-	bool close() const;
-	int getCcost() const;
-	int getFcost() const;
-	Node* getPrevious() const;
+	bool open(int ID) const;
+	bool close(int ID) const;
+	int getCcost(int ID) const;
+	int getFcost(int ID) const;
+	Node* getPrevious(int ID) const;
 	bool walkable() const;
-	void setOpen(bool open);
-	void setClose(bool close);
-	void setFcost(int fCost);
-	void setGcost(int gCost);
-	void setPrevious(Node* previous);
+	void setOpen(bool open, int ID);
+	void setClose(bool close, int ID);
+	void setFcost(int fCost, int ID);
+	void setGcost(int gCost, int ID);
+	void setPrevious(Node* previous, int ID);
 	void setUp(bool walkable);
+	void setUp(bool walkable, int ID);
 	int getIndex();
 	SDL_Rect getRect(SDL_Rect camera);
 	SDL_Point getPosition();
-	SDL_Point getTileID();
+	int getTileID();
 	void setTileID(int ID);
 
-	//overloads
-	bool operator<(const Node&) const;
-	bool operator==(const Node&) const;
-
 private:
+	const int MAX_NUM = 7;
 	bool m_walkable;
-	bool m_open;
-	bool m_close;
-	int m_fCost;
-	int m_gCost;
+	std::vector<bool> m_open;
+	std::vector<bool> m_close;
+	std::vector<int> m_fCost;
+	std::vector<int> m_gCost;
 	int m_index;
-	Node* m_prevNode;
+	std::vector<Node*> m_prevNode;
 	int m_size;
-	SDL_Point m_position;
 	SDL_Rect m_rect;
-	SDL_Point m_tileID;
+	uint8_t m_tileID;
 };
