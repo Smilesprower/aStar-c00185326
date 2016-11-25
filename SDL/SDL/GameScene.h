@@ -2,6 +2,7 @@
 #pragma once
 #include "Scene.h"
 #include "Enemy.h"
+#include "Player.h"
 #include "AStar.h"
 #include "Node.h"
 
@@ -12,7 +13,9 @@ public:
 	{
 		Intro,
 		Run,
-		End
+		End,
+		Waiting,
+		Stopped,
 	};
 
 	GameScene(SDL_Renderer* renderer, int width, int height);
@@ -24,7 +27,8 @@ public:
 	void start()override;
 	void stop()override;
 	void loadContent(SDL_Renderer* renderer);
-	void setUp(int non, int npa, int nae);
+	void setUpWorld(int non, int npa, int nae);
+	void quickSetUp();
 	void reset();
 	void checkCameraBounds();
 
@@ -38,13 +42,12 @@ private:
 	const int MAX_NUM_OF_DRAWABLE_NODES = 1200;	// row * col
 	const int MAX_ENEMIES = 500;
 
-	int m_state;
+	int m_renderState, m_updateState;
 	int m_screenWidth, m_screenHeight, m_worldWidth, m_worldHeight;
-	bool m_start;
 	int m_numOfNodes, m_nodesPerAxis, m_numOfActiveEnemies;
-	int m_x, m_y;
+	int m_numOfRuns;
 
-	Enemy m_enemy;
+	Player m_player;
 	AStar m_astar;
 	std::vector<Node*> m_nodes;
 	std::vector<Enemy*> m_enemies;

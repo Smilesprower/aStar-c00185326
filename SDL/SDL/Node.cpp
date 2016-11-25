@@ -1,46 +1,55 @@
 #include "stdafx.h"
 #include "Node.h"
 
+Node::Node(const Node & copy)
+{
+	m_open = copy.m_open;
+	m_close = copy.m_open;
+	m_fCost = copy.m_fCost;
+	m_gCost = copy.m_gCost;
+	m_rect = copy.m_rect;
+	m_tileID = copy.m_tileID;
+	m_prevNode = copy.m_prevNode;
+	m_walkable = copy.m_walkable;
+	m_index = copy.m_index;
+}
 
 Node::Node(int index, int xPos, int yPos, int NODESIZE)
 	: m_index(index)
 	, m_tileID(1)
 	, m_rect { xPos* NODESIZE, yPos * NODESIZE, NODESIZE, NODESIZE }
-	, m_close(MAX_NUM)
-	, m_open(MAX_NUM)
-	, m_fCost(MAX_NUM)
-	, m_gCost(MAX_NUM)
-	, m_prevNode(MAX_NUM)
 {
 }
 
 Node::~Node()
 {
+	delete m_prevNode;
+	m_prevNode = nullptr;
 }
 
 bool Node::open(int ID) const
 {
-	return m_open[ID];
+	return m_open;
 }
 
 bool Node::close(int ID) const
 {
-	return m_close[ID];
+	return m_close;
 }
 
 int Node::getCcost(int ID) const
 {
-	return m_gCost[ID];
+	return m_gCost;
 }
 
 int Node::getFcost(int ID) const
 {
-	return m_fCost[ID];
+	return m_fCost;
 }
 
 Node * Node::getPrevious(int ID) const
 {
-	return m_prevNode[ID];
+	return m_prevNode;
 }
 
 bool Node::walkable() const
@@ -50,39 +59,36 @@ bool Node::walkable() const
 
 void Node::setOpen(bool open, int ID)
 {
-	m_open[ID] = open;
+	m_open = open;
 }
 
 void Node::setClose(bool close, int ID)
 {
-	m_close[ID] = close;
+	m_close = close;
 }
 
 void Node::setFcost(int fCost, int ID)
 {
-	m_fCost[ID] = fCost;
+	m_fCost = fCost;
 }
 
 void Node::setGcost(int gCost, int ID)
 {
-	m_gCost[ID] = gCost;
+	m_gCost = gCost;
 }
 
 void Node::setPrevious(Node * previous, int ID)
 {
-	m_prevNode[ID] = previous;
+	m_prevNode = previous;
 }
 
 void Node::setUp(bool walkable)
 {
-	for (int i = 0; i < MAX_NUM; i++)
-	{
-		m_open[i] = false;
-		m_close[i] = false;
-		m_fCost[i] = std::numeric_limits<int>::max();
-		m_gCost[i] = std::numeric_limits<int>::max();
-		m_prevNode[i] = 0;
-	}
+	m_open = false;
+	m_close = false;
+	m_fCost = std::numeric_limits<int>::max();
+	m_gCost = std::numeric_limits<int>::max();
+	m_prevNode = 0;
 	m_walkable = walkable;
 	// May need to remove if drawing gets slow
 	if (walkable)
@@ -90,20 +96,13 @@ void Node::setUp(bool walkable)
 	else
 		m_tileID = 5;
 }
-void Node::setUp(bool walkable, int ID)
+void Node::setUp(int ID)
 {
-	m_open[ID] = false;
-	m_close[ID] = false;
-	m_fCost[ID] = std::numeric_limits<int>::max();
-	m_gCost[ID] = std::numeric_limits<int>::max();
-	m_prevNode[ID] = 0;
-
-	m_walkable = walkable;
-	// May need to remove if drawing gets slow
-	if (walkable)
-	m_tileID = m_index % 3;
-	else
-	m_tileID = 5;
+	m_open = false;
+	m_close = false;
+	m_fCost = std::numeric_limits<int>::max();
+	m_gCost = std::numeric_limits<int>::max();
+	m_prevNode = 0;
 }
 int Node::getIndex()
 {

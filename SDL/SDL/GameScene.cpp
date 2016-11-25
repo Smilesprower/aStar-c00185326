@@ -2,7 +2,7 @@
 #include "GameScene.h"
 
 GameScene::GameScene(SDL_Renderer* renderer, int width, int height)
-	: m_state(Intro)
+	: m_renderState(Intro)
 	, m_screenWidth(width)
 	, m_screenHeight(height)
 	, m_camera{ 0, 0, m_screenWidth, m_screenHeight }
@@ -10,17 +10,20 @@ GameScene::GameScene(SDL_Renderer* renderer, int width, int height)
 	, m_source{ 0, 40, 175, 100}
 	, m_sourceRect{ 0, 0, NODE_SIZE, NODE_SIZE }
 	, m_astar(MAX_NODES, MAX_NODES_PER_AXIS, NODE_SIZE)
-	, m_enemy(NODE_SIZE)
 	, m_numOfActiveEnemies(0)
+	, m_numOfRuns(0)
+	, m_player(SDL_Point{0,0}, NODE_SIZE)
 {
+	int x = 0;
+	int y = 0;
 	for (int i = 0; i < MAX_NODES; i++)
 	{
-		m_nodes.push_back(new Node(i, m_x, m_y, NODE_SIZE));
-		m_x++;
-		if (m_x == MAX_NODES_PER_AXIS)
+		m_nodes.push_back(new Node(i, x, y, NODE_SIZE));
+		x++;
+		if (x == MAX_NODES_PER_AXIS)
 		{
-			m_x = 0;
-			m_y++;
+			x = 0;
+			y++;
 		}
 	}
 	for (int i = 0; i < MAX_ENEMIES; i++)
@@ -41,14 +44,14 @@ void GameScene::render(SDL_Renderer* renderer)
 {
 	// Intro State
 	////////////////////////////
-	if (m_state == Intro)
-	{
+	if (m_renderState == Intro)
 		SDL_RenderCopyEx(renderer, m_texture, &m_source, &m_dest, 0, nullptr, SDL_RendererFlip::SDL_FLIP_NONE);
-	}
 	// Run State
 	////////////////////////////
-	else if (m_state == Run)
+	else if (m_renderState == Run)
 	{
+		// DRAWING NODES
+		///////////////////////////////////////////////////////
 		int startNodeX = 0;
 		int startNodeY = 0;
 		if(m_camera.x != 0)
@@ -73,37 +76,55 @@ void GameScene::render(SDL_Renderer* renderer)
 			SDL_RenderCopyEx(renderer, m_texture, &m_sourceRect, &m_nodes[currentNode]->getRect(m_camera), 0, nullptr, SDL_RendererFlip::SDL_FLIP_NONE);
 			xCounter++;
 		}
-		for (int i = 0; i < MAX_ENEMIES; i++)
+		// DRAWING PLAYER
+		///////////////////////////////////////////////////////
+		SDL_Point temp = m_player.getTileID();
+		m_sourceRect.x = temp.x * NODE_SIZE;
+		m_sourceRect.y = temp.y * NODE_SIZE;
+		SDL_RenderCopyEx(renderer, m_texture, &m_sourceRect, &m_player.getRect(m_camera), 0, nullptr, SDL_RendererFlip::SDL_FLIP_NONE);
+
+		// DRAWING ENEMIES
+		///////////////////////////////////////////////////////
+		for (int i = 0; i < m_numOfActiveEnemies; i++)
 		{
-			if (m_enemies[i]->getActive())
-			{
-				SDL_Point temp = m_enemies[i]->getTileID();
-				m_sourceRect.x = temp.x * NODE_SIZE;
-				m_sourceRect.y = temp.y * NODE_SIZE;
-				SDL_RenderCopyEx(renderer, m_texture, &m_sourceRect, &m_enemies[i]->getRect(m_camera), 0, nullptr, SDL_RendererFlip::SDL_FLIP_NONE);
-			}
+			SDL_Point temp = m_enemies[i]->getTileID();
+			m_sourceRect.x = temp.x * NODE_SIZE;
+			m_sourceRect.y = temp.y * NODE_SIZE;
+			SDL_RenderCopyEx(renderer, m_texture, &m_sourceRect, &m_enemies[i]->getRect(m_camera), 0, nullptr, SDL_RendererFlip::SDL_FLIP_NONE);
 		}
 	}
 }
 
 void GameScene::update(float deltaTime)
 {
-	if (m_start)
+	if (m_updateState == Waiting)
 	{
-		int x = SDL_GetTicks();
-		m_enemies[0]->SetPath(m_astar.findPath(&m_nodes, 0, m_enemies[0]->getStartNode(),0));
-		m_enemies[1]->SetPath(m_astar.findPath(&m_nodes, 0, m_enemies[1]->getStartNode(), 1));
-		int y = SDL_GetTicks();
-		std::cout << y - x << std::endl;
-		m_start = false;
+		m_enemies[0]->SetPath(m_astar.findPath(&m_nodes, m_player.getTile(), m_enemies[0]->getStartNode(),0));
+		m_updateState = Run;
 	}
-	if (!m_enemies[0]->isFinished())
+	else if (m_updateState == Run)
 	{
-		m_enemies[0]->update(deltaTime);
-		m_enemies[1]->update(deltaTime);
+		m_player.update(deltaTime);
+		if (!m_enemies[0]->isFinished())
+		{
+			m_enemies[0]->update(deltaTime);
+		}
+		else if(m_enemies[0]->isFinished())
+		{
+			if (m_enemies[0]->getTile() == m_player.getTile())
+			{
+				reset();
+			}
+			else
+			{
+				int x = m_enemies[0]->getTile();
+				quickSetUp();
+				m_enemies[0]->resetPath();
+				m_enemies[0]->SetPath(m_astar.findPath(&m_nodes, m_player.getTile(), m_enemies[0]->getTile(), 0));
+			}
+		}
 	}
-	else
-		reset();
+
 }
 
 void GameScene::onEvent(bool &quit)
@@ -111,7 +132,7 @@ void GameScene::onEvent(bool &quit)
 	if (Keyboard::Instance()->keyPressed(SDL_SCANCODE_ESCAPE))
 		quit = true;
 
-	switch (m_state)
+	switch (m_renderState)
 	{
 	case Intro:
 		if (Keyboard::Instance()->keyPressed(SDL_SCANCODE_1))
@@ -119,21 +140,21 @@ void GameScene::onEvent(bool &quit)
 			m_wallStartPoint.push_back(10);
 			m_wallStartPoint.push_back(20);
 			m_wallStartPoint.push_back(30);
-			setUp(1200, 40, 5);
-			m_state = Run;
+			setUpWorld(1200, 40, 1);
+			m_renderState = Run;
 		}
 		else if (Keyboard::Instance()->keyPressed(SDL_SCANCODE_3))
 		{
 			m_wallStartPoint.push_back(10);
 			m_wallStartPoint.push_back(20);
 			m_wallStartPoint.push_back(30);
-			setUp(MAX_NODES, MAX_NODES_PER_AXIS, 5);
-			m_state = Run;
+			setUpWorld(MAX_NODES, MAX_NODES_PER_AXIS, 1);
+			m_renderState = Run;
 		}
 		break;
 	case Run:
-		if (Keyboard::Instance()->keyPressed(SDL_SCANCODE_RETURN) && !m_start)
-			m_start = true;
+		if (Keyboard::Instance()->keyPressed(SDL_SCANCODE_RETURN) && m_renderState == Run && m_updateState != Run)
+			m_updateState = Waiting;
 		if (Keyboard::Instance()->keyDown(SDL_SCANCODE_LEFT))
 			m_camera.x -= NODE_SIZE;
 		else if (Keyboard::Instance()->keyDown(SDL_SCANCODE_RIGHT))
@@ -156,76 +177,83 @@ void GameScene::stop()
 void GameScene::loadContent(SDL_Renderer * renderer)
 {
 	// Load Stuff here
-	////////////////////////////
 	if (TextureManager::Instance()->load("assets/tiles.png", Textures::Tiles, renderer))
 		m_texture = TextureManager::Instance()->getTexture(Textures::Tiles);
 }
 // Set up variables
 ////////////////////////////
-void GameScene::setUp(int non, int npa, int nae) // Num of Nodes, Nodes per Axis
+void GameScene::quickSetUp()
+{
+	int x = 0;
+	int y = 0;
+	for (int i = 0; i < m_numOfNodes; i++)
+	{
+		m_nodes[x + y]->setUp(0);
+		x++;
+		if (x == m_nodesPerAxis)
+		{
+			x = 0;
+			y += MAX_NODES_PER_AXIS;
+		}
+	}
+}
+
+void GameScene::setUpWorld(int non, int npa, int nae) // Num of Nodes, Nodes per Axis, Num of Enemies
 {
 	std::cout << "Setting Up" << std::endl;
-	m_start = false;
 	m_numOfNodes = non;
 	m_nodesPerAxis = npa;
 	m_numOfActiveEnemies = nae;
-	m_x = 0; // Counter for number of nodes per row
-	m_y = 0; // Counter for number of cols
+	int x = 0; // Counter for number of nodes per row
+	int y = 0; // Counter for number of cols
 
 	int endPoint = (non / npa -1) * MAX_NODES_PER_AXIS;
-	// Reset the nodes I need
 	for (int i = 0; i < m_numOfNodes; i++)
 	{
-		//// Fix up walls
-		if (m_x + m_y == m_wallStartPoint[0]+ m_y && m_y > 1)
-			m_nodes[m_x + m_y]->setUp(false);
-		else if (m_x + m_y == m_wallStartPoint[1] + m_y && m_y < endPoint)
-			m_nodes[m_x + m_y]->setUp(false);
-		else if (m_x + m_y == m_wallStartPoint[2] + m_y && m_y > 1)
-			m_nodes[m_x + m_y]->setUp(false);
+		//TODO: Fix Walls
+		if (x + y == m_wallStartPoint[0]+ y && y > 1)
+			m_nodes[x + y]->setUp(false);
+		else if (x + y == m_wallStartPoint[1] + y && y < endPoint)
+			m_nodes[x + y]->setUp(false);
+		else if (x + y == m_wallStartPoint[2] + y && y > 1)
+			m_nodes[x + y]->setUp(false);
 		else
-			m_nodes[m_x + m_y]->setUp(true);
+			m_nodes[x + y]->setUp(true);
 
-		m_x++;
-		if (m_x == m_nodesPerAxis)
+		x++;
+		if (x == m_nodesPerAxis)
 		{
-			m_x = 0;
-			m_y += MAX_NODES_PER_AXIS;
+			x = 0;
+			y += MAX_NODES_PER_AXIS;
 		}
 	}
 
 	m_worldWidth = m_nodesPerAxis * NODE_SIZE;
 	m_worldHeight = (m_numOfNodes / m_nodesPerAxis) * NODE_SIZE;
 
-	//m_enemies[0]->setUp(SDL_Point{ 10,10 }, MAX_NODES_PER_AXIS, NODE_SIZE);
-	// Need some way of placing 500 enemies
+	m_player.reset(SDL_Point{ 2, 10 });
 
-	m_enemies[0]->setUp(SDL_Point{ 35, 29 }, MAX_NODES_PER_AXIS);
-	m_enemies[1]->setUp(SDL_Point{ 36, 0 }, MAX_NODES_PER_AXIS);
-	//for (int i = 0; i < m_numOfActiveEnemies; i++)
-	//{
-	//	m_enemies[i]->setUp(SDL_Point{ 35+i, 29 }, MAX_NODES_PER_AXIS, NODE_SIZE);
-	//}
-
-
+	// TODO: Set up all enemies
+	for (int i = 0; i < m_numOfActiveEnemies; i++)
+		m_enemies[i]->setUp(SDL_Point{ 35+i, 29 }, MAX_NODES_PER_AXIS);
 	std::cout << "Done" << std::endl;
 }
-// Reset up variables
-////////////////////////////
+// RESET VARS
+///////////////////////////////////////////////////////
 void GameScene::reset()
 {
-	for (int i = 0; i < MAX_ENEMIES; i++)
+	for (int i = 0; i < m_numOfActiveEnemies; i++)
 		m_enemies[i]->reset();
-	m_state = Intro;
-	m_start = false;
+	m_renderState = Intro;
+	m_updateState = Stopped;
 	m_numOfNodes = 0;
 	m_nodesPerAxis = 0;
+	m_numOfActiveEnemies = 0;
 }
-
+// CAMERA BOUNDARY CHECK
+///////////////////////////////////////////////////////
 void GameScene::checkCameraBounds()
 {
-	// Camera Bounds
-	//////////////////////////////
 	if (m_camera.x < 0)
 		m_camera.x = 0;
 	else if (m_camera.x > m_worldWidth - m_camera.w)

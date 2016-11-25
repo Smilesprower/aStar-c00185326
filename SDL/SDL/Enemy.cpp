@@ -95,11 +95,23 @@ bool Enemy::isFinished()
 
 void Enemy::reset()
 {
+	m_nextPath.x = 0;
+	m_nextPath.y = 0;
+	m_path.clear();
 	m_active = false;
-	m_pathCount = 0;
 	m_start = false;
 	m_finished = false;
+	m_pathCount = 0;
 	m_tileID.x = Up;
+}
+
+void Enemy::resetPath()
+{
+	m_nextPath.x = 0;
+	m_nextPath.y = 0;
+	m_path.clear();
+	m_pathCount = 0;
+	m_finished = false;
 }
 
 bool Enemy::getActive()
@@ -115,5 +127,11 @@ void Enemy::setActive(bool active)
 SDL_Point Enemy::getTileID()
 {
 	return m_tileID;
+}
+
+int Enemy::getTile()
+{
+	int x = (m_rect.x / m_rect.w) + (m_rect.y / m_rect.h) * 1000;
+	return (m_rect.x / m_rect.w) + (m_rect.y / m_rect.h) * 1000;
 }
 

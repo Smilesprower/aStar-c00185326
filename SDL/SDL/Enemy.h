@@ -24,9 +24,12 @@ public:
 	int getStartNode();
 	bool isFinished();
 	void reset();
+	void resetPath();
 	bool getActive();
 	void setActive(bool active);
 	SDL_Point getTileID();
+	int getTile();
+
 
 private:
 	const int SPEED = 20;
