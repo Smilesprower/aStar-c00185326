@@ -27,7 +27,7 @@ public:
 	void start()override;
 	void stop()override;
 	void loadContent(SDL_Renderer* renderer);
-	void setUpWorld(int non, int npa, int nae);
+	void setUpWorld(int non, int npa, int nae, int offset);
 	void quickSetUp();
 	void reset();
 	void checkCameraBounds();
@@ -44,7 +44,7 @@ private:
 
 	int m_renderState, m_updateState;
 	int m_screenWidth, m_screenHeight, m_worldWidth, m_worldHeight;
-	int m_numOfNodes, m_nodesPerAxis, m_numOfActiveEnemies;
+	int m_numOfNodes, m_nodesPerAxis, m_numOfActiveEnemies, m_wallOffset;
 	int m_numOfRuns;
 
 	Player m_player;
@@ -55,5 +55,5 @@ private:
 	std::vector<SDL_Point> m_path;
 	SDL_Texture* m_texture;
 	SDL_Rect m_source, m_dest, m_camera, m_sourceRect;
-	
+
 };

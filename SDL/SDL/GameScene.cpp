@@ -11,7 +11,7 @@ GameScene::GameScene(SDL_Renderer* renderer, int width, int height)
 	, m_sourceRect{ 0, 0, NODE_SIZE, NODE_SIZE }
 	, m_astar(MAX_NODES, MAX_NODES_PER_AXIS, NODE_SIZE)
 	, m_numOfActiveEnemies(0)
-	, m_numOfRuns(0)
+	, m_wallOffset(0)
 	, m_player(SDL_Point{0,0}, NODE_SIZE)
 {
 	int x = 0;
@@ -99,7 +99,10 @@ void GameScene::update(float deltaTime)
 {
 	if (m_updateState == Waiting)
 	{
-		m_enemies[0]->SetPath(m_astar.findPath(&m_nodes, m_player.getTile(), m_enemies[0]->getStartNode(),0));
+		int x = SDL_GetTicks();
+		m_enemies[0]->SetPath(m_astar.findPath(&m_nodes,m_player.getTile(), m_enemies[0]->getStartNode(),0));
+		int y = SDL_GetTicks();
+		std::cout << y - x << "Time Taken" << std::endl;
 		m_updateState = Run;
 	}
 	else if (m_updateState == Run)
@@ -117,8 +120,6 @@ void GameScene::update(float deltaTime)
 			}
 			else
 			{
-				int x = m_enemies[0]->getTile();
-				quickSetUp();
 				m_enemies[0]->resetPath();
 				m_enemies[0]->SetPath(m_astar.findPath(&m_nodes, m_player.getTile(), m_enemies[0]->getTile(), 0));
 			}
@@ -137,18 +138,12 @@ void GameScene::onEvent(bool &quit)
 	case Intro:
 		if (Keyboard::Instance()->keyPressed(SDL_SCANCODE_1))
 		{
-			m_wallStartPoint.push_back(10);
-			m_wallStartPoint.push_back(20);
-			m_wallStartPoint.push_back(30);
-			setUpWorld(1200, 40, 1);
+			setUpWorld(1200, 40, 1, 10);
 			m_renderState = Run;
 		}
 		else if (Keyboard::Instance()->keyPressed(SDL_SCANCODE_3))
 		{
-			m_wallStartPoint.push_back(10);
-			m_wallStartPoint.push_back(20);
-			m_wallStartPoint.push_back(30);
-			setUpWorld(MAX_NODES, MAX_NODES_PER_AXIS, 1);
+			setUpWorld(MAX_NODES, MAX_NODES_PER_AXIS, 1, 55);
 			m_renderState = Run;
 		}
 		break;
@@ -198,28 +193,34 @@ void GameScene::quickSetUp()
 	}
 }
 
-void GameScene::setUpWorld(int non, int npa, int nae) // Num of Nodes, Nodes per Axis, Num of Enemies
+void GameScene::setUpWorld(int non, int npa, int nae, int offset) // Num of Nodes, Nodes per Axis, Num of Enemies
 {
 	std::cout << "Setting Up" << std::endl;
 	m_numOfNodes = non;
 	m_nodesPerAxis = npa;
 	m_numOfActiveEnemies = nae;
+	m_wallOffset = offset;
+
 	int x = 0; // Counter for number of nodes per row
 	int y = 0; // Counter for number of cols
 
-	int endPoint = (non / npa -1) * MAX_NODES_PER_AXIS;
+	int endPoint = ((non / npa) -1) * MAX_NODES_PER_AXIS;
+	int count = 0;
 	for (int i = 0; i < m_numOfNodes; i++)
 	{
-		//TODO: Fix Walls
-		if (x + y == m_wallStartPoint[0]+ y && y > 1)
+		////// Wall Code - Ugh
+		if ((i % m_nodesPerAxis % m_wallOffset == 0) && i % m_nodesPerAxis != 0 && (y > 0 && y < endPoint))
 			m_nodes[x + y]->setUp(false);
-		else if (x + y == m_wallStartPoint[1] + y && y < endPoint)
-			m_nodes[x + y]->setUp(false);
-		else if (x + y == m_wallStartPoint[2] + y && y > 1)
-			m_nodes[x + y]->setUp(false);
+		else if (i % m_nodesPerAxis % m_wallOffset == 0 && i % m_nodesPerAxis != 0 && (y == 0 || y == endPoint))
+		{
+			count++;
+			if (count % 2 == 1)
+				m_nodes[x + y]->setUp(true);
+			else
+				m_nodes[x + y]->setUp(false);
+		}
 		else
-			m_nodes[x + y]->setUp(true);
-
+		m_nodes[x + y]->setUp(true);
 		x++;
 		if (x == m_nodesPerAxis)
 		{
@@ -231,11 +232,11 @@ void GameScene::setUpWorld(int non, int npa, int nae) // Num of Nodes, Nodes per
 	m_worldWidth = m_nodesPerAxis * NODE_SIZE;
 	m_worldHeight = (m_numOfNodes / m_nodesPerAxis) * NODE_SIZE;
 
-	m_player.reset(SDL_Point{ 2, 10 });
+	m_player.reset(SDL_Point{ 1, 1 });
 
 	// TODO: Set up all enemies
 	for (int i = 0; i < m_numOfActiveEnemies; i++)
-		m_enemies[i]->setUp(SDL_Point{ 35+i, 29 }, MAX_NODES_PER_AXIS);
+		m_enemies[i]->setUp(SDL_Point{ 39, 29 }, MAX_NODES_PER_AXIS);
 	std::cout << "Done" << std::endl;
 }
 // RESET VARS

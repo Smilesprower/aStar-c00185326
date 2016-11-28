@@ -37,7 +37,7 @@ bool Node::close(int ID) const
 	return m_close;
 }
 
-int Node::getCcost(int ID) const
+int Node::getGcost(int ID) const
 {
 	return m_gCost;
 }

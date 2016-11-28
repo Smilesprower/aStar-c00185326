@@ -10,7 +10,7 @@ public:
 	~Node();
 	bool open(int ID) const;
 	bool close(int ID) const;
-	int getCcost(int ID) const;
+	int getGcost(int ID) const;
 	int getFcost(int ID) const;
 	Node* getPrevious(int ID) const;
 	bool walkable() const;

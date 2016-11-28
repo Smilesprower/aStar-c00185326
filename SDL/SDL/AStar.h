@@ -4,16 +4,11 @@
 #include <queue>
 #include "Node.h"
 #include <vector>
+#include <map>
 
 class AStar {
-	class NodeSearchCostComparer {
-	public:
-		bool operator()(const std::pair<int, int>& p1, const std::pair<int, int>& p2) {
-			return p1.first > p2.first;
-		}
-	};
-
 public:
+
 	AStar();
 	AStar(int numOfNodes, int numOfNodesPerAxis, int nodeDimensions);
 	~AStar();
@@ -23,14 +18,34 @@ public:
 	int getNeighbourIndex(Node * current, int neighbourIndex);
 
 private:
+	struct Data
+	{
+		bool m_open;
+		bool m_close;
+		int m_fCost;
+		int m_gCost;
+		Node* m_prevNode;
+		Data(bool open = false, bool closed = false, int fCost = std::numeric_limits<int>::max(), int gCost = std::numeric_limits<int>::max(), Node* prevNode = 0)
+			: m_open(open)
+			, m_close(closed)
+			, m_fCost(fCost)
+			, m_gCost(gCost)
+			, m_prevNode(prevNode)
+		{
+		}
+	};
+
+	class NodeSearchCostComparer {
+	public:
+		std::map<Node*, Data> * nodeData;
+		bool operator()(Node * p1, Node * p2) {
+			return nodeData->at(p1).m_fCost > nodeData->at(p2).m_fCost;
+		}
+	};
 	int m_numOfNodes;
 	int m_numOfNodesPerAxis;
 	int m_nodeDimensions;
 	int m_neighbourNode[4];
 	std::vector<Node*>m_nodes;
-	std::vector<SDL_Point> createPath(Node* goalNode, Node * startNode, int ID);
-	int m_neighbourID;
-	int m_currentID;
-	const int goalID = 0;
-	const int startID = 1;
+	std::vector<SDL_Point> createPath(Node* goalNode, Node * startNode, std::map<Node*, Data> * nodeData);
 };
