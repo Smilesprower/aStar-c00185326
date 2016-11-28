@@ -206,16 +206,19 @@ void GameScene::setUpWorld(int non, int npa, int nae) // Num of Nodes, Nodes per
 	m_numOfActiveEnemies = nae;
 	int x = 0; // Counter for number of nodes per row
 	int y = 0; // Counter for number of cols
+	int wallCounter = 3;
+	bool flag = false;
 
+	int wallSize = m_smallWall.size();
 	int endPoint = (non / npa -1) * MAX_NODES_PER_AXIS;
 	for (int i = 0; i < m_numOfNodes; i++)
 	{
 		//TODO: Fix Walls
-		if (x + y == m_wallStartPoint[0]+ y && y > 1)
+		if (x + y == m_smallWall[0] + y && y > 1)
 			m_nodes[x + y]->setUp(false);
-		else if (x + y == m_wallStartPoint[1] + y && y < endPoint)
+		else if (x + y == m_smallWall[1] + y && y < endPoint)
 			m_nodes[x + y]->setUp(false);
-		else if (x + y == m_wallStartPoint[2] + y && y > 1)
+		else if (x + y == m_smallWall[2] + y && y > 1)
 			m_nodes[x + y]->setUp(false);
 		else
 			m_nodes[x + y]->setUp(true);

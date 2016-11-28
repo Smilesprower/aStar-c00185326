@@ -55,5 +55,6 @@ private:
 	std::vector<SDL_Point> m_path;
 	SDL_Texture* m_texture;
 	SDL_Rect m_source, m_dest, m_camera, m_sourceRect;
-	
+	const std::vector<int> m_smallWall{ 10, 20, 30 };
+
 };
