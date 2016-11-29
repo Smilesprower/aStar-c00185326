@@ -138,11 +138,13 @@ void GameScene::onEvent(bool &quit)
 	case Intro:
 		if (Keyboard::Instance()->keyPressed(SDL_SCANCODE_1))
 		{
+			// Max Nodes, Nodes Per Axis, Active Enemies, Wall Offset
 			setUpWorld(1200, 40, 1, 10);
 			m_renderState = Run;
 		}
 		else if (Keyboard::Instance()->keyPressed(SDL_SCANCODE_3))
 		{
+			// Max Nodes, Nodes Per Axis, Active Enemies, Wall Offset
 			setUpWorld(MAX_NODES, MAX_NODES_PER_AXIS, 1, 55);
 			m_renderState = Run;
 		}
@@ -175,27 +177,8 @@ void GameScene::loadContent(SDL_Renderer * renderer)
 	if (TextureManager::Instance()->load("assets/tiles.png", Textures::Tiles, renderer))
 		m_texture = TextureManager::Instance()->getTexture(Textures::Tiles);
 }
-// Set up variables
-////////////////////////////
-void GameScene::quickSetUp()
-{
-	int x = 0;
-	int y = 0;
-	for (int i = 0; i < m_numOfNodes; i++)
-	{
-		m_nodes[x + y]->setUp(0);
-		x++;
-		if (x == m_nodesPerAxis)
-		{
-			x = 0;
-			y += MAX_NODES_PER_AXIS;
-		}
-	}
-}
-
 void GameScene::setUpWorld(int non, int npa, int nae, int offset) // Num of Nodes, Nodes per Axis, Num of Enemies
 {
-	std::cout << "Setting Up" << std::endl;
 	m_numOfNodes = non;
 	m_nodesPerAxis = npa;
 	m_numOfActiveEnemies = nae;
@@ -209,6 +192,7 @@ void GameScene::setUpWorld(int non, int npa, int nae, int offset) // Num of Node
 	for (int i = 0; i < m_numOfNodes; i++)
 	{
 		////// Wall Code - Ugh
+		// Brick off tile not Used
 		if ((i % m_nodesPerAxis % m_wallOffset == 0) && i % m_nodesPerAxis != 0 && (y > 0 && y < endPoint))
 			m_nodes[x + y]->setUp(false);
 		else if (i % m_nodesPerAxis % m_wallOffset == 0 && i % m_nodesPerAxis != 0 && (y == 0 || y == endPoint))
@@ -234,10 +218,8 @@ void GameScene::setUpWorld(int non, int npa, int nae, int offset) // Num of Node
 
 	m_player.reset(SDL_Point{ 1, 1 });
 
-	// TODO: Set up all enemies
 	for (int i = 0; i < m_numOfActiveEnemies; i++)
 		m_enemies[i]->setUp(SDL_Point{ 39, 29 }, MAX_NODES_PER_AXIS);
-	std::cout << "Done" << std::endl;
 }
 // RESET VARS
 ///////////////////////////////////////////////////////

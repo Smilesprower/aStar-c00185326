@@ -18,6 +18,8 @@ public:
 	int getNeighbourIndex(Node * current, int neighbourIndex);
 
 private:
+	// Critical data of the Node
+	////////////////////////////////////////
 	struct Data
 	{
 		bool m_open;
@@ -34,7 +36,8 @@ private:
 		{
 		}
 	};
-
+	// NodeSearchCostComparer
+	////////////////////////////////////////
 	class NodeSearchCostComparer {
 	public:
 		std::map<Node*, Data> * nodeData;
@@ -42,10 +45,10 @@ private:
 			return nodeData->at(p1).m_fCost > nodeData->at(p2).m_fCost;
 		}
 	};
+
 	int m_numOfNodes;
 	int m_numOfNodesPerAxis;
 	int m_nodeDimensions;
 	int m_neighbourNode[4];
-	std::vector<Node*>m_nodes;
 	std::vector<SDL_Point> createPath(Node* goalNode, Node * startNode, std::map<Node*, Data> * nodeData);
 };

@@ -39,8 +39,7 @@ std::vector<SDL_Point> AStar::findPath(std::vector<Node*> *m_nodes, int startInd
 		std::priority_queue<Node *, std::vector<Node *>, NodeSearchCostComparer> openset(comp);
 		
 		nodeData[start].m_gCost = 0;
-		int temp = getHeuristic(start, goal);
-		nodeData[start].m_fCost = temp;
+		nodeData[start].m_fCost = getHeuristic(start, goal);
 		nodeData[start].m_open = true;
 
 		openset.push(start);
@@ -84,8 +83,7 @@ std::vector<SDL_Point> AStar::findPath(std::vector<Node*> *m_nodes, int startInd
 				{
 					nodeData[neighbour].m_prevNode = current;
 					nodeData[neighbour].m_gCost = tenativeGCost;
-					int temp = getHeuristic(neighbour, goal);
-					nodeData[neighbour].m_fCost = temp;
+					nodeData[neighbour].m_fCost = getHeuristic(neighbour, goal);
 				}
 
 				if (nodeData[neighbour].m_open == false)
