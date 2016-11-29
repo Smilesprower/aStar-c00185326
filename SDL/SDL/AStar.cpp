@@ -3,7 +3,7 @@
 
 
 const int NEIGHBOUR_COUNT = 4;
-const int COST = 1;
+const int COST = 20;
 
 
 AStar::AStar()
@@ -34,25 +34,22 @@ std::vector<SDL_Point> AStar::findPath(std::vector<Node*> *m_nodes, int startInd
 
 	if (start != 0 && goal != 0)
 	{
-		NodeSearchCostComparer comp;
-		comp.nodeData = &nodeData;
-		std::priority_queue<Node *, std::vector<Node *>, NodeSearchCostComparer> openset(comp);
-		
+		std::priority_queue<std::pair<int, int>, std::vector<std::pair<int, int>>, NodeSearchCostComparer> openset;
 		nodeData[start].m_gCost = 0;
 		nodeData[start].m_fCost = getHeuristic(start, goal);
 		nodeData[start].m_open = true;
 
-		openset.push(start);
+		openset.push(std::pair<int, int>(nodeData[start].m_fCost, startIndex));
 
 		int previousCost = 0;
 
 		while (openset.size() != 0)
 		{
-			Node* current = openset.top();
+			Node* current = m_nodes->at(openset.top().second);
 			openset.pop();
 			if (current == goal)
 			{
-				return createPath(goal, start, & nodeData);
+				return createPath(goal, start, &nodeData);
 			}
 			nodeData[current].m_open = false;
 			nodeData[current].m_close = true;
@@ -63,12 +60,12 @@ std::vector<SDL_Point> AStar::findPath(std::vector<Node*> *m_nodes, int startInd
 
 				Node* neighbour;
 				if (neighbourIndex == -1)
-				{ 
-					neighbour = 0; 
+				{
+					neighbour = 0;
 				}
-				else 
-				{ 
-					neighbour = m_nodes->at(neighbourIndex); 
+				else
+				{
+					neighbour = m_nodes->at(neighbourIndex);
 				}
 
 				if (neighbour == 0 || nodeData[neighbour].m_close == true
@@ -91,7 +88,7 @@ std::vector<SDL_Point> AStar::findPath(std::vector<Node*> *m_nodes, int startInd
 
 					neighbour->setTileID(3);
 					nodeData[neighbour].m_open = true;
-					openset.push(neighbour);
+					openset.push(std::pair<int, int>(nodeData[neighbour].m_fCost, neighbourIndex));
 				}
 				previousCost = tenativeGCost;
 			}
@@ -118,10 +115,10 @@ int AStar::getHeuristic(Node * n1, Node * n2)
 }
 
 /*
-	1D Vector Horizontal Check
-	Check that edge index's +1 or -1 are not allowed to be valid,
-	because this wraps them to the other side of the screen.
-	[9] = right edge node. [9 + 1] = left side node.
+1D Vector Horizontal Check
+Check that edge index's +1 or -1 are not allowed to be valid,
+because this wraps them to the other side of the screen.
+[9] = right edge node. [9 + 1] = left side node.
 */
 int AStar::getNeighbourIndex(Node * current, int neighbourIndex)
 {

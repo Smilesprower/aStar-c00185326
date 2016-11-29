@@ -193,17 +193,17 @@ void GameScene::setUpWorld(int non, int npa, int nae, int offset) // Num of Node
 	{
 		////// Wall Code - Ugh
 		// Brick off tile not Used
-		if ((i % m_nodesPerAxis % m_wallOffset == 0) && i % m_nodesPerAxis != 0 && (y > 0 && y < endPoint))
-			m_nodes[x + y]->setUp(false);
-		else if (i % m_nodesPerAxis % m_wallOffset == 0 && i % m_nodesPerAxis != 0 && (y == 0 || y == endPoint))
-		{
-			count++;
-			if (count % 2 == 1)
-				m_nodes[x + y]->setUp(true);
-			else
-				m_nodes[x + y]->setUp(false);
-		}
-		else
+		//if ((i % m_nodesPerAxis % m_wallOffset == 0) && i % m_nodesPerAxis != 0 && (y > 0 && y < endPoint))
+		//	m_nodes[x + y]->setUp(false);
+		//else if (i % m_nodesPerAxis % m_wallOffset == 0 && i % m_nodesPerAxis != 0 && (y == 0 || y == endPoint))
+		//{
+		//	count++;
+		//	if (count % 2 == 1)
+		//		m_nodes[x + y]->setUp(true);
+		//	else
+		//		m_nodes[x + y]->setUp(false);
+		//}
+		//else
 		m_nodes[x + y]->setUp(true);
 		x++;
 		if (x == m_nodesPerAxis)

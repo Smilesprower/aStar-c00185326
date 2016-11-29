@@ -8,7 +8,12 @@
 
 class AStar {
 public:
-
+	class NodeSearchCostComparer {
+	public:
+		bool operator()(const std::pair<int, int>& p1, const std::pair<int, int>& p2) {
+			return p1.first > p2.first;
+		}
+	};
 	AStar();
 	AStar(int numOfNodes, int numOfNodesPerAxis, int nodeDimensions);
 	~AStar();
@@ -34,15 +39,6 @@ private:
 			, m_gCost(gCost)
 			, m_prevNode(prevNode)
 		{
-		}
-	};
-	// NodeSearchCostComparer
-	////////////////////////////////////////
-	class NodeSearchCostComparer {
-	public:
-		std::map<Node*, Data> * nodeData;
-		bool operator()(Node * p1, Node * p2) {
-			return nodeData->at(p1).m_fCost > nodeData->at(p2).m_fCost;
 		}
 	};
 
