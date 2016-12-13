@@ -9,6 +9,7 @@ Enemy::Enemy(int size)
 	, m_size(size)
 	, m_rect{0, 0, size, size}
 	, m_collision(true)
+	, m_awaitingPath(false)
 {
 }
 
@@ -69,6 +70,7 @@ void Enemy::update(float deltaTime, std::vector<Node*> *nodes, int * neighbourTi
 			m_tileID.x = Up;
 			m_rect.y -= SPEED;
 			nodes->at(currTileID + neighbourTiles[3])->setOccupied(true);
+			nodes->at(currTileID)->setOccupied(false);
 			nodes->at(currTileID)->setOccupied(false);
 		}
 	}
@@ -150,5 +152,15 @@ void Enemy::setState(int state)
 void Enemy::setCollision(bool collision)
 {
 	m_collision = collision;
+}
+
+bool Enemy::getAwaitingPath()
+{
+	return m_awaitingPath;
+}
+
+void Enemy::setAwaitingPath(bool awaitingPath)
+{
+	m_awaitingPath = awaitingPath;
 }
 

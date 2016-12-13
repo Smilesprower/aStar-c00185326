@@ -85,7 +85,7 @@ std::vector<SDL_Point> AStar::findPath(std::vector<Node*> *m_nodes, int startInd
 				if (nodeData[neighbour].m_open == false)
 				{
 
-					//neighbour->setTileID(3);
+					neighbour->setTileID(3);
 					nodeData[neighbour].m_open = true;
 					openset.push(std::pair<int, int>(nodeData[neighbour].m_fCost, neighbourIndex));
 				}
@@ -144,7 +144,7 @@ std::vector<SDL_Point> AStar::createPath(Node * goalNode, Node * startNode, std:
 
 	for (Node* previous = goalNode; previous != 0; previous = nodeData->at(previous).m_prevNode)
 	{
-		//previous->setTileID(4);
+		previous->setTileID(4);
 		path.push_back(previous->getPosition());
 	}
 	return path;

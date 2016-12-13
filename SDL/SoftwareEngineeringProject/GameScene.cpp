@@ -17,6 +17,9 @@ GameScene::GameScene(SDL_Renderer* renderer, int width, int height)
 	, m_preCalcPaths(MAX_NUM_OF_WALLS)
 	, m_numOfEnemiesFinished(0)
 	, m_cameraState(Default)
+	, m_autoRun(false)
+	, m_startGame(false)
+	, m_pathCount(0)
 {
 	int x = 0;
 	int y = 0;
@@ -57,7 +60,15 @@ void GameScene::render(SDL_Renderer* renderer)
 	// Intro State
 	////////////////////////////
 	if (m_renderState == Intro)
+	{
 		SDL_RenderCopy(renderer, m_texture, &m_source, &m_dest);
+		if (m_autoRun)
+		{
+			setUpWorld(MAX_NODES, MAX_NODES_PER_AXIS, 55, MAX_NUM_OF_WALLS, MAX_ENEMIES, true);
+			m_renderState = Run;
+			m_updateState = Run;
+		}
+	}
 	
 	// Run State
 	////////////////////////////
@@ -113,7 +124,24 @@ void GameScene::render(SDL_Renderer* renderer)
 
 void GameScene::update(float deltaTime)
 {
-	if (m_updateState == Run)
+
+	for (int i = m_wayPoints.size() - 2; i >= 0; i--)
+	{
+		if (m_preCalcPaths[i].size() > 0)
+			m_pathCount++;
+		else
+		{
+			m_pathCount = 0;
+			continue;
+		}
+		if (m_pathCount == m_wayPoints.size() - 1)
+		{
+			m_pathCount = 0;
+			m_startGame = true;
+		}
+	}
+
+	if (m_updateState == Run && m_startGame)
 	{
 		// ENEMY UPDATE
 		///////////////////////////////////////////////////////
@@ -127,7 +155,11 @@ void GameScene::update(float deltaTime)
 
 				if (state == GetPath)
 				{
-					m_threadPool->addTask(std::bind(&GameScene::getPath, this, i, m_wayPoints[m_wayPoints.size() - 1], enemyTile, true));
+					if (!m_enemies[i]->getAwaitingPath())
+					{
+						m_threadPool->addTask(std::bind(&GameScene::getPath, this, i, m_wayPoints[m_wayPoints.size() - 1], enemyTile, true));
+						m_enemies[i]->setAwaitingPath(true);
+					}
 					m_enemies[i]->setState(AwaitingPreCalcPaths);
 				}
 				else if (state == AwaitingPreCalcPaths)
@@ -156,7 +188,11 @@ void GameScene::update(float deltaTime)
 					else
 					{
 						m_enemies[i]->setCollision(false);
-						m_threadPool->addTask(std::bind(&GameScene::getPath, this, i, playerTile, enemyTile, true));
+						if (!m_enemies[i]->getAwaitingPath())
+						{
+							m_threadPool->addTask(std::bind(&GameScene::getPath, this, i, playerTile, enemyTile, true));
+							m_enemies[i]->setAwaitingPath(true);
+						}
 					}
 				}
 			}
@@ -210,6 +246,10 @@ void GameScene::onEvent(bool &quit)
 			setUpWorld(MAX_NODES, MAX_NODES_PER_AXIS, 55, MAX_NUM_OF_WALLS, MAX_ENEMIES, true);
 			m_renderState = Run;
 		}
+		else if (Keyboard::Instance()->keyPressed(SDL_SCANCODE_A))
+		{
+			m_autoRun = true;
+		}
 		break;
 	case Run:
 		if (Keyboard::Instance()->keyPressed(SDL_SCANCODE_RETURN) && m_renderState == Run && m_updateState != Run)
@@ -228,6 +268,8 @@ void GameScene::onEvent(bool &quit)
 			m_cameraState = EnemyCam;
 		else if (Keyboard::Instance()->keyDown(SDL_SCANCODE_E))
 			m_cameraState = PlayerCam;
+		else if (Keyboard::Instance()->keyPressed(SDL_SCANCODE_S))
+			m_autoRun = false;
 		break;
 	}
 }
@@ -362,6 +404,8 @@ void GameScene::reset()
 	m_numOfActiveEnemies = 0;
 	m_numOfEnemiesFinished = 0;
 	m_wayPoints.clear();
+	m_startGame = false;
+	m_pathCount = 0;
 }
 // CAMERA BOUNDARY CHECK
 ///////////////////////////////////////////////////////
@@ -385,7 +429,10 @@ void GameScene::getPath(int index, int start, int end, bool enemy)
 	if (!enemy)
 		m_preCalcPaths[index] = temp;
 	else
+	{
 		m_enemies[index]->SetPath(temp);
+		m_enemies[index]->setAwaitingPath(false);
+	}
 	SDL_UnlockMutex(m_lock);
 }
 

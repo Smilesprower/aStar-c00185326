@@ -73,4 +73,6 @@ private:
 	ThreadPool *m_threadPool;
 	SDL_mutex * m_lock;
 	int *m_neighbourTiles;
+	bool m_autoRun, m_startGame;
+	int m_pathCount;
 };

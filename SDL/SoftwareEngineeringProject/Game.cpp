@@ -118,10 +118,10 @@ void Game::Loop()
 		Update();
 		Render();
 
-		int frameTicks = capTimer.getTicks();
-		if (frameTicks < SCREEN_TICKS_PER_FRAME)
-		{
-			SDL_Delay(SCREEN_TICKS_PER_FRAME - frameTicks);
-		}
+		//int frameTicks = capTimer.getTicks();
+		//if (frameTicks < SCREEN_TICKS_PER_FRAME)
+		//{
+		//	SDL_Delay(SCREEN_TICKS_PER_FRAME - frameTicks);
+		//}
 	}
 }

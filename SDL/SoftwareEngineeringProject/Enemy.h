@@ -31,7 +31,8 @@ public:
 	SDL_Point getPosition();
 	void setState(int state);
 	void setCollision(bool collision);
-	
+	bool getAwaitingPath();
+	void setAwaitingPath(bool awaitingPath);
 
 private:
 	const int SPEED = 20;
@@ -45,5 +46,6 @@ private:
 	SDL_Point m_nextPath;
 	SDL_Point m_tileID;
 	std::vector<SDL_Point> m_path;
+	bool m_awaitingPath;
 };
 
