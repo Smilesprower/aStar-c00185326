@@ -108,11 +108,18 @@ echo D|xcopy /E /Y "$(ProjectDir)assets" "$(TargetDir)assets"</Command>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>$(ProjectDir)include;$(ProjectDir)dependencies\SDL2_image-2.0.1\include;$(ProjectDir)dependencies\SDL\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>$(ProjectDir)dependencies\SDL2_image-2.0.1\lib\x64;$(ProjectDir)dependencies\SDL\lib\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
+    <PostBuildEvent>
+      <Command>copy "$(ProjectDir)dependencies\SDL\lib\x64\SDL2.dll" "$(TargetDir)"
+copy "$(ProjectDir)dependencies\SDL2_image-2.0.1\lib\x64\*.dll" "$(TargetDir)"
+echo D|xcopy /E /Y "$(ProjectDir)assets" "$(TargetDir)assets"</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -147,13 +154,20 @@ echo D|xcopy /E /Y "$(ProjectDir)assets" "$(TargetDir)assets"</Command>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>$(ProjectDir)include;$(ProjectDir)dependencies\SDL2_image-2.0.1\include;$(ProjectDir)dependencies\SDL\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>$(ProjectDir)dependencies\SDL2_image-2.0.1\lib\x64;$(ProjectDir)dependencies\SDL\lib\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
+    <PostBuildEvent>
+      <Command>copy "$(ProjectDir)dependencies\SDL\lib\x64\SDL2.dll" "$(TargetDir)"
+copy "$(ProjectDir)dependencies\SDL2_image-2.0.1\lib\x64\*.dll" "$(TargetDir)"
+echo D|xcopy /E /Y "$(ProjectDir)assets" "$(TargetDir)assets"</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
