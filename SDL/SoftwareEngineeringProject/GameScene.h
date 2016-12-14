@@ -75,4 +75,6 @@ private:
 	int *m_neighbourTiles;
 	bool m_autoRun, m_startGame;
 	int m_pathCount;
+	int m_numOfCompletedPaths;
+	int m_startTime, m_endTime, m_totalTime;
 };

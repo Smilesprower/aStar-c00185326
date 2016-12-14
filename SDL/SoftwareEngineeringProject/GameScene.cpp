@@ -20,6 +20,7 @@ GameScene::GameScene(SDL_Renderer* renderer, int width, int height)
 	, m_autoRun(false)
 	, m_startGame(false)
 	, m_pathCount(0)
+	, m_numOfCompletedPaths(-1)
 {
 	int x = 0;
 	int y = 0;
@@ -64,9 +65,18 @@ void GameScene::render(SDL_Renderer* renderer)
 		SDL_RenderCopy(renderer, m_texture, &m_source, &m_dest);
 		if (m_autoRun)
 		{
+			//setUpWorld(10000, 100, 16, 6, 50, true);
+			//setUpWorld(1200, 40, 10, 3, 5, false);
 			setUpWorld(MAX_NODES, MAX_NODES_PER_AXIS, 55, MAX_NUM_OF_WALLS, MAX_ENEMIES, true);
 			m_renderState = Run;
 			m_updateState = Run;
+
+			m_endTime = SDL_GetTicks();
+			int x = m_endTime - m_startGame;
+			std::cout << "Runs Completed " << m_numOfCompletedPaths++ << " in " << m_endTime - m_startTime << std::endl;
+			m_endTime = 0;
+			m_startTime = 0;
+
 		}
 	}
 	
@@ -124,7 +134,6 @@ void GameScene::render(SDL_Renderer* renderer)
 
 void GameScene::update(float deltaTime)
 {
-
 	for (int i = m_wayPoints.size() - 2; i >= 0; i--)
 	{
 		if (m_preCalcPaths[i].size() > 0)
@@ -143,6 +152,7 @@ void GameScene::update(float deltaTime)
 
 	if (m_updateState == Run && m_startGame)
 	{
+		m_startTime = SDL_GetTicks();
 		// ENEMY UPDATE
 		///////////////////////////////////////////////////////
 		for (int i = 0; i < m_numOfActiveEnemies; i++)
