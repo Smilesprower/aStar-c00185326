@@ -20,6 +20,8 @@ Enemy::~Enemy()
 
 void Enemy::setUp(SDL_Point pos, int m_nodesPerAxis)
 {
+	m_awaitingPath = false;
+	m_pathCount = 0;
 	m_state = 0;
 	m_collision = true;
 	m_active = true;
@@ -70,7 +72,6 @@ void Enemy::update(float deltaTime, std::vector<Node*> *nodes, int * neighbourTi
 			m_tileID.x = Up;
 			m_rect.y -= SPEED;
 			nodes->at(currTileID + neighbourTiles[3])->setOccupied(true);
-			nodes->at(currTileID)->setOccupied(false);
 			nodes->at(currTileID)->setOccupied(false);
 		}
 	}

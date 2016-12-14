@@ -6,8 +6,8 @@ GameScene::GameScene(SDL_Renderer* renderer, int width, int height)
 	, m_screenWidth(width)
 	, m_screenHeight(height)
 	, m_camera{ 0, 0, m_screenWidth, m_screenHeight }
-	, m_dest{ 312, 250, 175, 100 }						// Location of the title screen co - ords
-	, m_source{ 0, 40, 175, 100 }						// Source Rect for the title screen image in texture
+	, m_dest{ 312, 175, 175, 285 }						// Location of the title screen co - ords
+	, m_source{ 0, 40, 175, 285 }						// Source Rect for the title screen image in texture
 	, m_sourceRect{ 0, 0, NODE_SIZE, NODE_SIZE }		// Source Rect for tiles and player
 	, m_astar(MAX_NODES, MAX_NODES_PER_AXIS)			
 	, m_numOfActiveEnemies(0)
@@ -20,7 +20,12 @@ GameScene::GameScene(SDL_Renderer* renderer, int width, int height)
 	, m_autoRun(false)
 	, m_startGame(false)
 	, m_pathCount(0)
-	, m_numOfCompletedPaths(-1)
+	, m_numOfCompletedPaths(0)
+	, m_threadsEnabled(true)
+	, m_totalTasks(0)
+	, m_writeToFile(false)
+	, m_autoRunState(0)
+	, m_numOfAutoRuns(MAX_AUTO_RUNS)
 {
 	int x = 0;
 	int y = 0;
@@ -65,18 +70,22 @@ void GameScene::render(SDL_Renderer* renderer)
 		SDL_RenderCopy(renderer, m_texture, &m_source, &m_dest);
 		if (m_autoRun)
 		{
-			//setUpWorld(10000, 100, 16, 6, 50, true);
-			//setUpWorld(1200, 40, 10, 3, 5, false);
-			setUpWorld(MAX_NODES, MAX_NODES_PER_AXIS, 55, MAX_NUM_OF_WALLS, MAX_ENEMIES, true);
+			if (m_autoRunState == Small)
+				setUpWorld(1200, 40, 10, 3, 5, false);
+			else if (m_autoRunState == Medium)
+				setUpWorld(10000, 100, 16, 6, 50, true);
+			else if (m_autoRunState == Large)
+				setUpWorld(MAX_NODES, MAX_NODES_PER_AXIS, 55, MAX_NUM_OF_WALLS, MAX_ENEMIES, true);
+
 			m_renderState = Run;
 			m_updateState = Run;
-
-			m_endTime = SDL_GetTicks();
-			int x = m_endTime - m_startGame;
-			std::cout << "Runs Completed " << m_numOfCompletedPaths++ << " in " << m_endTime - m_startTime << std::endl;
-			m_endTime = 0;
-			m_startTime = 0;
-
+			if (m_numOfCompletedPaths == m_numOfAutoRuns )
+			{
+				m_numOfAutoRuns += MAX_AUTO_RUNS;
+				m_writeToFile = true;
+				m_autoRunState++;
+			}
+			m_numOfCompletedPaths++;
 		}
 	}
 	
@@ -152,7 +161,6 @@ void GameScene::update(float deltaTime)
 
 	if (m_updateState == Run && m_startGame)
 	{
-		m_startTime = SDL_GetTicks();
 		// ENEMY UPDATE
 		///////////////////////////////////////////////////////
 		for (int i = 0; i < m_numOfActiveEnemies; i++)
@@ -167,10 +175,19 @@ void GameScene::update(float deltaTime)
 				{
 					if (!m_enemies[i]->getAwaitingPath())
 					{
-						m_threadPool->addTask(std::bind(&GameScene::getPath, this, i, m_wayPoints[m_wayPoints.size() - 1], enemyTile, true));
-						m_enemies[i]->setAwaitingPath(true);
+						if (m_threadsEnabled)
+						{
+							m_totalTasks++;
+							m_threadPool->addTask(std::bind(&GameScene::getPath, this, i, m_wayPoints[m_wayPoints.size() - 1], enemyTile, true));
+							m_enemies[i]->setAwaitingPath(true);
+							m_enemies[i]->setState(AwaitingPreCalcPaths);
+						}
+						else
+						{
+							m_enemies[i]->SetPath(m_astar.findPath(&m_nodes, m_wayPoints[m_wayPoints.size() - 1], enemyTile));
+							m_enemies[i]->setState(AwaitingPreCalcPaths);
+						}
 					}
-					m_enemies[i]->setState(AwaitingPreCalcPaths);
 				}
 				else if (state == AwaitingPreCalcPaths)
 				{
@@ -200,8 +217,16 @@ void GameScene::update(float deltaTime)
 						m_enemies[i]->setCollision(false);
 						if (!m_enemies[i]->getAwaitingPath())
 						{
-							m_threadPool->addTask(std::bind(&GameScene::getPath, this, i, playerTile, enemyTile, true));
-							m_enemies[i]->setAwaitingPath(true);
+							if (m_threadsEnabled)
+							{
+								m_totalTasks++;
+								m_threadPool->addTask(std::bind(&GameScene::getPath, this, i, playerTile, enemyTile, true));
+								m_enemies[i]->setAwaitingPath(true);
+							}
+							else
+							{
+								m_enemies[i]->SetPath(m_astar.findPath(&m_nodes, playerTile, enemyTile));
+							}
 						}
 					}
 				}
@@ -240,24 +265,39 @@ void GameScene::onEvent(bool &quit)
 	case Intro:
 		if (Keyboard::Instance()->keyPressed(SDL_SCANCODE_1))
 		{
+			std::cout << "SMALL LEVEL STARTED" << std::endl;
 			// Max Nodes, Nodes Per Axis, Wall Offset, Wall Number, Active Enemies, Enemy Start Pos, fit on one row
 			setUpWorld(1200, 40, 10, 3, 5, false);
 			m_renderState = Run;
 		}
 		else if (Keyboard::Instance()->keyPressed(SDL_SCANCODE_2))
 		{
+			std::cout << "MEDIUM LEVEL STARTED" << std::endl;
 			// Max Nodes, Nodes Per Axis, Wall Offset, Wall Number, Active Enemies, Enemy Start Pos, fit on one row
 			setUpWorld(10000, 100, 16, 6, 50, true);
 			m_renderState = Run;
 		} 
 		else if (Keyboard::Instance()->keyPressed(SDL_SCANCODE_3))
 		{
+			std::cout << "LARGE LEVEL STARTED" << std::endl;
 			// Max Nodes, Nodes Per Axis, Wall Offset, Wall Number, Active Enemies, Enemy Start Pos, fit on one row
 			setUpWorld(MAX_NODES, MAX_NODES_PER_AXIS, 55, MAX_NUM_OF_WALLS, MAX_ENEMIES, true);
 			m_renderState = Run;
 		}
-		else if (Keyboard::Instance()->keyPressed(SDL_SCANCODE_A))
+		else if (Keyboard::Instance()->keyPressed(SDL_SCANCODE_4))
 		{
+			std::cout << "THREADING DISABLED" << std::endl;
+			m_threadsEnabled = false;
+		}
+		else if (Keyboard::Instance()->keyPressed(SDL_SCANCODE_5))
+		{
+			std::cout << "THREADING ENABLED" << std::endl;
+			m_threadsEnabled = true;
+		}
+		else if (Keyboard::Instance()->keyPressed(SDL_SCANCODE_6))
+		{
+			std::cout << "AUTO RUN ENABLED" << std::endl;
+			m_startTime = SDL_GetTicks();
 			m_autoRun = true;
 		}
 		break;
@@ -278,8 +318,12 @@ void GameScene::onEvent(bool &quit)
 			m_cameraState = EnemyCam;
 		else if (Keyboard::Instance()->keyDown(SDL_SCANCODE_E))
 			m_cameraState = PlayerCam;
-		else if (Keyboard::Instance()->keyPressed(SDL_SCANCODE_S))
+		else if (Keyboard::Instance()->keyPressed(SDL_SCANCODE_7))
+		{
+			std::cout << "AUTO RUN ENABLED" << std::endl;
 			m_autoRun = false;
+			m_writeToFile = true;
+		}
 		break;
 	}
 }
@@ -400,13 +444,40 @@ void GameScene::setUpWorld(int non, int npa, int wallOffset, int numOfWalls, int
 
 	// THREADING WAYPOINTS
 	///////////////////////////////////////////////////////
-	for (int i = 0; i < m_wayPoints.size()-1; i++)
-		m_threadPool->addTask(std::bind(&GameScene::getPath, this, i, m_wayPoints[i], m_wayPoints[i+1], false));
+	for (int i = 0; i < m_wayPoints.size() - 1; i++)
+	{
+		if (m_threadsEnabled)
+		{
+			m_totalTasks++;
+			m_threadPool->addTask(std::bind(&GameScene::getPath, this, i, m_wayPoints[i], m_wayPoints[i + 1], false));
+		}
+		else
+		{
+			m_preCalcPaths[i] = m_astar.findPath(&m_nodes, m_wayPoints[i], m_wayPoints[i + 1]);
+		}
+	}
+	checkCameraBounds();
 }
 // RESET VARS
 ///////////////////////////////////////////////////////
 void GameScene::reset()
 {
+	if (m_writeToFile)
+	{
+		m_endTime = SDL_GetTicks() - m_startTime;
+		Logger::Instance()->createLogContent(m_numOfActiveEnemies, m_threadsEnabled, m_endTime, m_numOfCompletedPaths - (m_autoRunState*MAX_AUTO_RUNS) + 1, m_totalTasks);
+		m_totalTasks = 0;
+		m_startTime = SDL_GetTicks();
+		m_endTime = 0;
+		m_writeToFile = false;
+		if (m_autoRunState > Large)
+		{
+			m_autoRun = false;
+			m_autoRunState = Small;
+			Logger::Instance()->createLog();
+		}
+	}
+
 	for (int i = 0; i < MAX_NUM_OF_WALLS; i++)
 		m_preCalcPaths[i].clear();
 	m_renderState = Intro;

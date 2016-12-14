@@ -179,6 +179,7 @@ echo D|xcopy /E /Y "$(ProjectDir)assets" "$(TargetDir)assets"</Command>
     <ClInclude Include="Game.h" />
     <ClInclude Include="GameScene.h" />
     <ClInclude Include="Keyboard.h" />
+    <ClInclude Include="Logger.h" />
     <ClInclude Include="LTimer.h" />
     <ClInclude Include="Node.h" />
     <ClInclude Include="Player.h" />
@@ -195,6 +196,7 @@ echo D|xcopy /E /Y "$(ProjectDir)assets" "$(TargetDir)assets"</Command>
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="GameScene.cpp" />
     <ClCompile Include="Keyboard.cpp" />
+    <ClCompile Include="Logger.cpp" />
     <ClCompile Include="LTimer.cpp" />
     <ClCompile Include="Node.cpp" />
     <ClCompile Include="Player.cpp" />

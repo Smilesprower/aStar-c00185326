@@ -6,11 +6,18 @@
 #include "AStar.h"
 #include "Node.h"
 #include "ThreadPool.h"
+#include "Logger.h"
 
 class GameScene : public Scene
 {
 
 public:
+	enum autoRunState
+	{
+		Small,
+		Medium,
+		Large
+	};
 	enum EnemyState
 	{
 		GetPath,
@@ -47,6 +54,7 @@ public:
 	void checkCameraBounds();
 	void getPath(int index, int start, int end, bool enemy);
 private:
+	const int MAX_AUTO_RUNS = 2;
 	const int MAX_NUM_OF_WALLS = 18;
 	const int MAX_NODES = 1000000;
 	const int MAX_NODES_PER_AXIS = 1000;
@@ -73,8 +81,7 @@ private:
 	ThreadPool *m_threadPool;
 	SDL_mutex * m_lock;
 	int *m_neighbourTiles;
-	bool m_autoRun, m_startGame;
+	bool m_autoRun, m_startGame, m_threadsEnabled, m_writeToFile;
 	int m_pathCount;
-	int m_numOfCompletedPaths;
-	int m_startTime, m_endTime, m_totalTime;
+	int m_startTime, m_endTime, m_totalTasks, m_numOfCompletedPaths, m_autoRunState, m_numOfAutoRuns;
 };
