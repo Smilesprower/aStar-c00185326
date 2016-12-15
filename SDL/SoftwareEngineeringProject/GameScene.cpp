@@ -465,7 +465,7 @@ void GameScene::reset()
 	if (m_writeToFile)
 	{
 		m_endTime = SDL_GetTicks() - m_startTime;
-		Logger::Instance()->createLogContent(m_numOfActiveEnemies, m_threadsEnabled, m_endTime, m_numOfCompletedPaths - (m_autoRunState*MAX_AUTO_RUNS) + 1, m_totalTasks);
+		Logger::Instance()->createLogContent(m_numOfActiveEnemies, m_threadsEnabled, m_endTime, MAX_AUTO_RUNS, m_totalTasks);
 		m_totalTasks = 0;
 		m_startTime = SDL_GetTicks();
 		m_endTime = 0;

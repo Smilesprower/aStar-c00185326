@@ -54,7 +54,7 @@ public:
 	void checkCameraBounds();
 	void getPath(int index, int start, int end, bool enemy);
 private:
-	const int MAX_AUTO_RUNS = 2;
+	const int MAX_AUTO_RUNS = 3;
 	const int MAX_NUM_OF_WALLS = 18;
 	const int MAX_NODES = 1000000;
 	const int MAX_NODES_PER_AXIS = 1000;
